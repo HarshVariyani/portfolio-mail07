@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gMouseY = e.clientY;
     });
 
-    // Star Object
     class Star {
       constructor() {
         this.x = Math.random() * gWidth;
@@ -81,11 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderGalaxy() {
       gCtx.clearRect(0, 0, gWidth, gHeight);
 
-      // Subtle Cursor Parallax Offset
       const offsetX = (gMouseX - gWidth / 2) * 0.02;
       const offsetY = (gMouseY - gHeight / 2) * 0.02;
 
-      // Soft Ambient Nebula Glow Gradient
       const nebulaGrad = gCtx.createRadialGradient(
         gWidth * 0.3 + offsetX, gHeight * 0.4 + offsetY, 50,
         gWidth * 0.3 + offsetX, gHeight * 0.4 + offsetY, gWidth * 0.6
@@ -96,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gCtx.fillStyle = nebulaGrad;
       gCtx.fillRect(0, 0, gWidth, gHeight);
 
-      // Render Constellation Connections
       for (let i = 0; i < stars.length; i++) {
         for (let j = i + 1; j < stars.length; j++) {
           const dx = stars[i].x - stars[j].x;
@@ -117,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Update and Draw Stars
       stars.forEach(star => {
         star.update();
         star.draw(gCtx, offsetX, offsetY);
@@ -307,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================================
-  // ANIMATED BUTTERFLY CURSOR & PARTICLES ENGINE (DESKTOP ONLY)
+  // ANIMATED BUTTERFLY CURSOR & "HV" INITIALS TRAIL ENGINE
   // ==========================================================================
   const butterflyCursor = document.getElementById('butterfly-cursor');
   const particleCanvas = document.getElementById('cursor-particle-canvas');
@@ -338,11 +333,13 @@ document.addEventListener('DOMContentLoaded', () => {
       mouseY = e.clientY;
     });
 
+    // Sparkle Particle featuring "HV" Initials Trail
     class SparkleParticle {
-      constructor(x, y, isBurst = false) {
+      constructor(x, y, isBurst = false, isInitials = false) {
         this.x = x;
         this.y = y;
         this.isBurst = isBurst;
+        this.isInitials = isInitials;
         
         if (isBurst) {
           const speed = Math.random() * 4.5 + 1.8;
@@ -352,6 +349,12 @@ document.addEventListener('DOMContentLoaded', () => {
           this.size = Math.random() * 3.5 + 2;
           this.alpha = 1;
           this.decay = Math.random() * 0.03 + 0.02;
+        } else if (isInitials) {
+          this.vx = (Math.random() - 0.5) * 0.6;
+          this.vy = -Math.random() * 0.8 - 0.3; // float gently upward
+          this.size = 13;
+          this.alpha = 0.95;
+          this.decay = 0.022;
         } else {
           this.vx = (Math.random() - 0.5) * 1.2;
           this.vy = Math.random() * 1.5 + 0.5;
@@ -370,12 +373,21 @@ document.addEventListener('DOMContentLoaded', () => {
       draw(context) {
         context.save();
         context.globalAlpha = Math.max(0, this.alpha);
-        context.fillStyle = '#ffffff';
-        context.shadowColor = 'rgba(255, 255, 255, 0.9)';
-        context.shadowBlur = 8;
-        context.beginPath();
-        context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        context.fill();
+
+        if (this.isInitials) {
+          context.font = '700 13px Outfit, sans-serif';
+          context.fillStyle = '#ffffff';
+          context.shadowColor = 'rgba(255, 255, 255, 0.9)';
+          context.shadowBlur = 9;
+          context.fillText('HV', this.x, this.y);
+        } else {
+          context.fillStyle = '#ffffff';
+          context.shadowColor = 'rgba(255, 255, 255, 0.9)';
+          context.shadowBlur = 8;
+          context.beginPath();
+          context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          context.fill();
+        }
         context.restore();
       }
     }
@@ -485,6 +497,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    let hvParticleCounter = 0;
+
     function renderLoop(time) {
       ctx.clearRect(0, 0, width, height);
 
@@ -507,8 +521,12 @@ document.addEventListener('DOMContentLoaded', () => {
       butterflyCursor.style.top = `${currentY}px`;
       butterflyCursor.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg) scale(${butterflyCursor.classList.contains('hovering') ? 1.38 : 1})`;
 
-      if (speed > 2 && Math.random() < 0.6) {
-        particles.push(new SparkleParticle(currentX + (Math.random() - 0.5) * 10, currentY + (Math.random() - 0.5) * 10));
+      // Emit Glowing "HV" Initials Trail on Mouse Movement
+      hvParticleCounter++;
+      if (speed > 2.2 && hvParticleCounter % 5 === 0) {
+        particles.push(new SparkleParticle(currentX, currentY, false, true));
+      } else if (speed > 1.2 && Math.random() < 0.4) {
+        particles.push(new SparkleParticle(currentX + (Math.random() - 0.5) * 8, currentY + (Math.random() - 0.5) * 8));
       }
 
       for (let i = releasedButterflies.length - 1; i >= 0; i--) {
@@ -527,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
         b.dom.style.transform = `translate(-50%, -50%) rotate(${heading}deg) scale(${opacity * 0.5 + 0.5})`;
         b.dom.style.opacity = opacity;
 
-        if (Math.random() < 0.4) {
+        if (Math.random() < 0.35) {
           particles.push(new SparkleParticle(b.x, b.y));
         }
 
@@ -776,7 +794,7 @@ ${fullName}`;
       const encodedBody = encodeURIComponent(body);
 
       const mailtoUrl = `mailto:${targetEmail}?subject=${encodedSubject}&body=${encodedBody}`;
-      const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${targetEmail}&su=${encodedSubject}&body=${encodedBody}`;
+      const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${targetEmail}?su=${encodedSubject}&body=${encodedBody}`;
 
       showToast('Opening Gmail with your inquiry details...');
 
