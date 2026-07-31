@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script
+   Harsh Portfolio - Main Interactive Script (Enhanced v2)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,6 +16,37 @@ document.addEventListener('DOMContentLoaded', () => {
       preloader.classList.add('loaded');
     }, 2500);
   }
+
+  // Mouse Spotlight Cursor Glow Effect
+  const cursorGlow = document.querySelector('.cursor-glow');
+  if (cursorGlow) {
+    window.addEventListener('mousemove', (e) => {
+      cursorGlow.style.left = `${e.clientX}px`;
+      cursorGlow.style.top = `${e.clientY}px`;
+    });
+  }
+
+  // Card 3D Tilt Effect on Mousemove
+  const tiltCards = document.querySelectorAll('.hero-card, .service-card, .portfolio-item, .contact-card');
+  tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = (y - centerY) / 25;
+      const rotateY = (centerX - x) / 25;
+      
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
+    });
+  });
 
   // Header Scroll Effect & Mobile Nav
   const header = document.querySelector('.header');
