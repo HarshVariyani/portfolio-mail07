@@ -25,6 +25,60 @@
 </head>
 <body>
 
+  <!-- Cursor Particle Canvas -->
+  <canvas id="cursor-particle-canvas"></canvas>
+
+  <!-- Animated Butterfly Cursor -->
+  <div id="butterfly-cursor">
+    <div class="butterfly-wrapper">
+      <svg class="butterfly-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+            <stop offset="50%" stop-color="#e2e8f0" stop-opacity="0.8" />
+            <stop offset="100%" stop-color="#94a3b8" stop-opacity="0.6" />
+          </linearGradient>
+          <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+            <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.2" />
+          </linearGradient>
+        </defs>
+
+        <!-- Left Wing Group -->
+        <g class="wing-left">
+          <!-- Upper Wing -->
+          <path d="M 50,45 C 30,10 5,20 10,48 C 15,62 38,58 50,48 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
+          <!-- Inner Pattern -->
+          <path d="M 50,45 C 35,22 18,28 20,44 C 22,54 38,52 50,47 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" />
+          <!-- Lower Wing -->
+          <path d="M 48,50 C 30,55 18,72 28,85 C 38,92 48,70 48,52 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
+        </g>
+
+        <!-- Right Wing Group -->
+        <g class="wing-right">
+          <!-- Upper Wing -->
+          <path d="M 50,45 C 70,10 95,20 90,48 C 85,62 62,58 50,48 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
+          <!-- Inner Pattern -->
+          <path d="M 50,45 C 65,22 82,28 80,44 C 78,54 62,52 50,47 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" />
+          <!-- Lower Wing -->
+          <path d="M 52,50 C 70,55 82,72 72,85 C 62,92 52,70 52,52 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
+        </g>
+
+        <!-- Butterfly Body & Antennae -->
+        <g class="butterfly-body">
+          <ellipse cx="50" cy="50" rx="3" ry="16" fill="#ffffff" />
+          <circle cx="50" cy="32" r="3.5" fill="#ffffff" />
+          <!-- Left Antenna -->
+          <path d="M 49,30 C 44,20 38,15 34,12" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" fill="none" />
+          <circle cx="34" cy="12" r="1.5" fill="#ffffff" />
+          <!-- Right Antenna -->
+          <path d="M 51,30 C 56,20 62,15 66,12" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" fill="none" />
+          <circle cx="66" cy="12" r="1.5" fill="#ffffff" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
   <!-- Mouse Spotlight Cursor Glow -->
   <div class="cursor-glow"></div>
 

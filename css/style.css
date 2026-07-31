@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Premium Luxury Black & White Design System (Enhanced v2)
+   Harsh Portfolio - Premium Luxury Black & White Design System (Enhanced v3)
    ========================================================================== */
 
 :root {
@@ -35,6 +35,13 @@
   --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hide Default Cursor on Desktop Fine Pointers */
+@media (hover: hover) and (pointer: fine) {
+  body, a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn {
+    cursor: none !important;
+  }
 }
 
 /* Reset & Base Styles */
@@ -82,6 +89,101 @@ body {
   color: var(--bg-primary);
 }
 
+/* ==========================================================================
+   ANIMATED BUTTERFLY CURSOR & PARTICLES
+   ========================================================================== */
+
+#butterfly-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  pointer-events: none;
+  z-index: 999999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease-out, filter 0.25s ease;
+  perspective: 600px;
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #butterfly-cursor {
+    display: block;
+  }
+}
+
+.butterfly-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.butterfly-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.4));
+  transition: filter 0.3s ease;
+}
+
+.wing-left {
+  transform-origin: right center;
+  animation: flapWingLeft 0.35s ease-in-out infinite alternate;
+}
+
+.wing-right {
+  transform-origin: left center;
+  animation: flapWingRight 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes flapWingLeft {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-62deg); }
+}
+
+@keyframes flapWingRight {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(62deg); }
+}
+
+/* Hovering State for Interactive Elements */
+#butterfly-cursor.hovering {
+  transform: translate(-50%, -50%) scale(1.38);
+}
+
+#butterfly-cursor.hovering .butterfly-svg {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 1)) drop-shadow(0 0 24px rgba(225, 48, 108, 0.6));
+}
+
+#butterfly-cursor.hovering .wing-left {
+  animation-duration: 0.16s;
+}
+
+#butterfly-cursor.hovering .wing-right {
+  animation-duration: 0.16s;
+}
+
+/* Cursor Trail Particles Canvas */
+#cursor-particle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999998;
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #cursor-particle-canvas {
+    display: block;
+  }
+}
+
 /* Mouse Spotlight Cursor Glow */
 .cursor-glow {
   position: fixed;
@@ -90,9 +192,9 @@ body {
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
   pointer-events: none;
-  z-index: 9999;
+  z-index: 9998;
   transform: translate(-50%, -50%);
   transition: opacity 0.3s ease;
   mix-blend-mode: screen;

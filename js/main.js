@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script (Enhanced v2)
+   Harsh Portfolio - Main Interactive Script (Enhanced v3)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,7 +17,157 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2500);
   }
 
-  // Mouse Spotlight Cursor Glow Effect
+  // ==========================================================================
+  // ANIMATED BUTTERFLY CURSOR & PARTICLES ENGINE (DESKTOP ONLY)
+  // ==========================================================================
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const butterflyCursor = document.getElementById('butterfly-cursor');
+  const particleCanvas = document.getElementById('cursor-particle-canvas');
+
+  if (isFinePointer && butterflyCursor && particleCanvas) {
+    const ctx = particleCanvas.getContext('2d');
+    let width = (particleCanvas.width = window.innerWidth);
+    let height = (particleCanvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = particleCanvas.width = window.innerWidth;
+      height = particleCanvas.height = window.innerHeight;
+    });
+
+    let mouseX = width / 2;
+    let mouseY = height / 2;
+    let currentX = width / 2;
+    let currentY = height / 2;
+    let angle = 0;
+    let currentAngle = 0;
+
+    const particles = [];
+    const maxParticles = 60;
+
+    // Track Mouse
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Particle Class
+    class SparkleParticle {
+      constructor(x, y, isBurst = false) {
+        this.x = x;
+        this.y = y;
+        this.isBurst = isBurst;
+        
+        if (isBurst) {
+          const speed = Math.random() * 4 + 1.5;
+          const rad = Math.random() * Math.PI * 2;
+          this.vx = Math.cos(rad) * speed;
+          this.vy = Math.sin(rad) * speed;
+          this.size = Math.random() * 3.5 + 2;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.03 + 0.02;
+        } else {
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = Math.random() * 1.5 + 0.5; // slow float down
+          this.size = Math.random() * 2.5 + 1;
+          this.alpha = Math.random() * 0.7 + 0.3;
+          this.decay = Math.random() * 0.025 + 0.015;
+        }
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+
+      draw(context) {
+        context.save();
+        context.globalAlpha = Math.max(0, this.alpha);
+        context.fillStyle = '#ffffff';
+        context.shadowColor = 'rgba(255, 255, 255, 0.9)';
+        context.shadowBlur = 8;
+        context.beginPath();
+        context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      }
+    }
+
+    // Click Dust Burst
+    window.addEventListener('mousedown', (e) => {
+      for (let i = 0; i < 14; i++) {
+        particles.push(new SparkleParticle(e.clientX, e.clientY, true));
+      }
+    });
+
+    // Hover Detection for Interactive Elements
+    const interactiveSelectors = 'a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .spec-item, .skill-card';
+    const interactives = document.querySelectorAll(interactiveSelectors);
+
+    interactives.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        butterflyCursor.classList.add('hovering');
+      });
+      el.addEventListener('mouseleave', () => {
+        butterflyCursor.classList.remove('hovering');
+      });
+    });
+
+    // 60 FPS Render Loop
+    let lastTime = 0;
+    function renderLoop(time) {
+      ctx.clearRect(0, 0, width, height);
+
+      // Smooth Easing Position
+      const dx = mouseX - currentX;
+      const dy = mouseY - currentY;
+
+      currentX += dx * 0.18;
+      currentY += dy * 0.18;
+
+      // Smooth Rotation in Direction of Flight
+      const speed = Math.sqrt(dx * dx + dy * dy);
+      if (speed > 1.5) {
+        angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+        let angleDiff = angle - currentAngle;
+        // Normalize angle
+        while (angleDiff > 180) angleDiff -= 360;
+        while (angleDiff < -180) angleDiff += 360;
+        currentAngle += angleDiff * 0.15;
+      }
+
+      // Update Butterfly Element Position & Rotation
+      butterflyCursor.style.left = `${currentX}px`;
+      butterflyCursor.style.top = `${currentY}px`;
+      butterflyCursor.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg) scale(${butterflyCursor.classList.contains('hovering') ? 1.38 : 1})`;
+
+      // Spawn Trail Particles on Movement
+      if (speed > 2 && Math.random() < 0.6) {
+        particles.push(new SparkleParticle(currentX + (Math.random() - 0.5) * 10, currentY + (Math.random() - 0.5) * 10));
+      }
+
+      // Render Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw(ctx);
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Cap particles limit
+      if (particles.length > maxParticles) {
+        particles.splice(0, particles.length - maxParticles);
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    requestAnimationFrame(renderLoop);
+  }
+
+  // Mouse Spotlight Cursor Glow Position Listener
   const cursorGlow = document.querySelector('.cursor-glow');
   if (cursorGlow) {
     window.addEventListener('mousemove', (e) => {
