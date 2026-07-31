@@ -41,42 +41,28 @@
             <stop offset="50%" stop-color="#e2e8f0" stop-opacity="0.8" />
             <stop offset="100%" stop-color="#94a3b8" stop-opacity="0.6" />
           </linearGradient>
-          <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
-            <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.2" />
-          </linearGradient>
         </defs>
 
         <!-- Left Wing Group -->
         <g class="wing-left">
-          <!-- Upper Wing -->
           <path d="M 50,45 C 30,10 5,20 10,48 C 15,62 38,58 50,48 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
-          <!-- Inner Pattern -->
           <path d="M 50,45 C 35,22 18,28 20,44 C 22,54 38,52 50,47 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" />
-          <!-- Lower Wing -->
           <path d="M 48,50 C 30,55 18,72 28,85 C 38,92 48,70 48,52 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
         </g>
 
         <!-- Right Wing Group -->
         <g class="wing-right">
-          <!-- Upper Wing -->
           <path d="M 50,45 C 70,10 95,20 90,48 C 85,62 62,58 50,48 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
-          <!-- Inner Pattern -->
           <path d="M 50,45 C 65,22 82,28 80,44 C 78,54 62,52 50,47 Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" />
-          <!-- Lower Wing -->
           <path d="M 52,50 C 70,55 82,72 72,85 C 62,92 52,70 52,52 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="1.2" />
         </g>
 
-        <!-- Butterfly Body & Antennae -->
+        <!-- Butterfly Body -->
         <g class="butterfly-body">
           <ellipse cx="50" cy="50" rx="3" ry="16" fill="#ffffff" />
           <circle cx="50" cy="32" r="3.5" fill="#ffffff" />
-          <!-- Left Antenna -->
-          <path d="M 49,30 C 44,20 38,15 34,12" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" fill="none" />
-          <circle cx="34" cy="12" r="1.5" fill="#ffffff" />
-          <!-- Right Antenna -->
-          <path d="M 51,30 C 56,20 62,15 66,12" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" fill="none" />
-          <circle cx="66" cy="12" r="1.5" fill="#ffffff" />
+          <path d="M 49,30 C 44,20 38,15 34,12" stroke="#ffffff" stroke-width="1.2" fill="none" />
+          <path d="M 51,30 C 56,20 62,15 66,12" stroke="#ffffff" stroke-width="1.2" fill="none" />
         </g>
       </svg>
     </div>
@@ -90,13 +76,37 @@
   <div class="glow-orb glow-orb-2"></div>
   <div class="glow-orb glow-orb-3"></div>
 
-  <!-- Luxury Preloader -->
+  <!-- Luxury Butterfly Preloader -->
   <div id="preloader">
     <div class="loader-content">
+      <div class="preloader-butterfly-icon">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="pWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+              <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.7" />
+            </linearGradient>
+          </defs>
+          <g class="preloader-wing-left">
+            <path d="M 50,45 C 30,10 5,20 10,48 C 15,62 38,58 50,48 Z" fill="url(#pWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+            <path d="M 48,50 C 30,55 18,72 28,85 C 38,92 48,70 48,52 Z" fill="url(#pWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+          </g>
+          <g class="preloader-wing-right">
+            <path d="M 50,45 C 70,10 95,20 90,48 C 85,62 62,58 50,48 Z" fill="url(#pWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+            <path d="M 52,50 C 70,55 82,72 72,85 C 62,92 52,70 52,52 Z" fill="url(#pWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+          </g>
+          <ellipse cx="50" cy="50" rx="3.5" ry="16" fill="#ffffff" />
+          <circle cx="50" cy="32" r="4" fill="#ffffff" />
+          <path d="M 49,30 C 44,18 36,12 32,9" stroke="#ffffff" stroke-width="1.5" fill="none" stroke-linecap="round" />
+          <path d="M 51,30 C 56,18 64,12 68,9" stroke="#ffffff" stroke-width="1.5" fill="none" stroke-linecap="round" />
+        </svg>
+      </div>
+
       <div class="loader-logo">HARSH</div>
       <div class="loader-bar-bg">
         <div class="loader-bar-fill"></div>
       </div>
+      <div class="loader-status">Loading Creative Experience</div>
     </div>
   </div>
 
@@ -162,7 +172,7 @@
         </div>
 
         <div class="hero-image-wrapper reveal-right">
-          <div class="hero-card">
+          <div class="hero-card cinematic-reveal">
             <img src="assets/images/hero.png" alt="Harsh - Creative Editor" class="hero-img">
 
             <div class="hero-floating-stat stat-1">
@@ -225,7 +235,7 @@
         </div>
 
         <div class="about-stats reveal-right">
-          <div class="hero-card" style="margin: 0 auto;">
+          <div class="hero-card cinematic-reveal" style="margin: 0 auto;">
             <img src="assets/images/video_editing.png" alt="Creative Studio Setup" class="hero-img" style="height: 380px;">
           </div>
         </div>
@@ -246,7 +256,7 @@
 
       <div class="services-grid">
         <!-- Service 1 -->
-        <div class="service-card reveal">
+        <div class="service-card reveal cinematic-reveal">
           <div>
             <div class="service-icon-box">
               <i class="fa-solid fa-video"></i>
@@ -267,7 +277,7 @@
         </div>
 
         <!-- Service 2 -->
-        <div class="service-card reveal">
+        <div class="service-card reveal cinematic-reveal">
           <div>
             <div class="service-icon-box">
               <i class="fa-solid fa-sliders"></i>
@@ -288,7 +298,7 @@
         </div>
 
         <!-- Service 3 -->
-        <div class="service-card reveal">
+        <div class="service-card reveal cinematic-reveal">
           <div>
             <div class="service-icon-box">
               <i class="fa-solid fa-box-open"></i>
@@ -309,7 +319,7 @@
         </div>
 
         <!-- Service 4 -->
-        <div class="service-card reveal">
+        <div class="service-card reveal cinematic-reveal">
           <div>
             <div class="service-icon-box">
               <i class="fa-solid fa-eye"></i>
@@ -330,7 +340,7 @@
         </div>
 
         <!-- Service 5 -->
-        <div class="service-card reveal">
+        <div class="service-card reveal cinematic-reveal">
           <div>
             <div class="service-icon-box">
               <i class="fa-solid fa-layer-group"></i>
@@ -446,7 +456,7 @@
       <!-- Portfolio Grid -->
       <div class="portfolio-grid">
         <!-- Item 1: Video -->
-        <div class="portfolio-item reveal" data-category="video" data-desc="Cinematic YouTube video edit featuring fast-paced cuts, sound effects, motion titles, and custom color grading.">
+        <div class="portfolio-item reveal cinematic-reveal" data-category="video" data-desc="Cinematic YouTube video edit featuring fast-paced cuts, sound effects, motion titles, and custom color grading.">
           <div class="portfolio-thumb">
             <img src="assets/images/video_editing.png" alt="Cinematic YouTube Video Edit">
             <div class="portfolio-overlay">
@@ -460,7 +470,7 @@
         </div>
 
         <!-- Item 2: Photo -->
-        <div class="portfolio-item reveal" data-category="photo" data-desc="High-fashion portrait retouching with frequency separation skin smoothing and color enhancement.">
+        <div class="portfolio-item reveal cinematic-reveal" data-category="photo" data-desc="High-fashion portrait retouching with frequency separation skin smoothing and color enhancement.">
           <div class="portfolio-thumb">
             <img src="assets/images/photo_editing.png" alt="High Fashion Portrait Retouching">
             <div class="portfolio-overlay">
@@ -474,7 +484,7 @@
         </div>
 
         <!-- Item 3: Product -->
-        <div class="portfolio-item reveal" data-category="product" data-desc="Commercial product photography composition with artificial splash graphics, dynamic lighting, and reflections.">
+        <div class="portfolio-item reveal cinematic-reveal" data-category="product" data-desc="Commercial product photography composition with artificial splash graphics, dynamic lighting, and reflections.">
           <div class="portfolio-thumb">
             <img src="assets/images/product_editing.png" alt="Luxury Product Render">
             <div class="portfolio-overlay">
@@ -488,7 +498,7 @@
         </div>
 
         <!-- Item 4: Thumbnail -->
-        <div class="portfolio-item reveal" data-category="thumbnail" data-desc="High-CTR YouTube thumbnail design with custom face glow, 3D text styling, and vibrant contrast pop.">
+        <div class="portfolio-item reveal cinematic-reveal" data-category="thumbnail" data-desc="High-CTR YouTube thumbnail design with custom face glow, 3D text styling, and vibrant contrast pop.">
           <div class="portfolio-thumb">
             <img src="assets/images/thumbnail_design.png" alt="High CTR YouTube Thumbnail">
             <div class="portfolio-overlay">
@@ -502,7 +512,7 @@
         </div>
 
         <!-- Item 5: Social -->
-        <div class="portfolio-item reveal" data-category="social" data-desc="Luxury dark mode Instagram carousel layout designed for premium personal branding.">
+        <div class="portfolio-item reveal cinematic-reveal" data-category="social" data-desc="Luxury dark mode Instagram carousel layout designed for premium personal branding.">
           <div class="portfolio-thumb">
             <img src="assets/images/social_media.png" alt="Social Media Carousel Design">
             <div class="portfolio-overlay">

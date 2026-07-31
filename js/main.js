@@ -1,20 +1,20 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script (Enhanced v4)
+   Harsh Portfolio - Main Interactive Script (Enhanced v5)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Preloader
+  // Preloader with Butterfly Logo & Progress Animation
   const preloader = document.getElementById('preloader');
   if (preloader) {
     window.addEventListener('load', () => {
       setTimeout(() => {
         preloader.classList.add('loaded');
-      }, 600);
+      }, 700);
     });
     // Fallback hide
     setTimeout(() => {
       preloader.classList.add('loaded');
-    }, 2500);
+    }, 2800);
   }
 
   // ==========================================================================
@@ -144,10 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
         x: originX,
         y: originY,
         vx: Math.cos(angleRad) * speed,
-        vy: Math.sin(angleRad) * speed - 0.8, // slight upward float bias
+        vy: Math.sin(angleRad) * speed - 0.8,
         wobbleFreq: Math.random() * 0.08 + 0.04,
         wobbleAmp: Math.random() * 3 + 1.5,
-        life: Math.floor(Math.random() * 90 + 110), // ~2.2s to ~3.5s
+        life: Math.floor(Math.random() * 90 + 110),
         maxLife: 200,
         time: 0
       };
@@ -155,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
       obj.maxLife = obj.life;
       releasedButterflies.push(obj);
 
-      // Limit active butterflies
       if (releasedButterflies.length > maxReleasedButterflies) {
         const oldest = releasedButterflies.shift();
         if (oldest && oldest.dom && oldest.dom.parentNode) {
@@ -184,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         butterflyCursor.classList.add('hovering');
         if (!hoverThrottled) {
           hoverThrottled = true;
-          spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 4)); // 4 to 5 butterflies
+          spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 4));
           setTimeout(() => { hoverThrottled = false; }, 800);
         }
       });
@@ -194,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       el.addEventListener('click', () => {
-        spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5)); // 5 to 6 butterflies on click
+        spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5));
       });
     });
 
@@ -246,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         b.dom.style.transform = `translate(-50%, -50%) rotate(${heading}deg) scale(${opacity * 0.5 + 0.5})`;
         b.dom.style.opacity = opacity;
 
-        // Spawn Sparkle Trail for Flying Element Butterflies
         if (Math.random() < 0.4) {
           particles.push(new SparkleParticle(b.x, b.y));
         }
@@ -269,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Cap particles limit
       if (particles.length > maxParticles) {
         particles.splice(0, particles.length - maxParticles);
       }
@@ -324,7 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
       header.classList.remove('scrolled');
     }
 
-    // Scroll active link highlight
     let currentSection = '';
     const sections = document.querySelectorAll('section[id]');
     sections.forEach(section => {
@@ -527,7 +523,6 @@ ${fullName}`;
       // Attempt Mailto
       setTimeout(() => {
         window.location.href = mailtoUrl;
-        // Fallback open Gmail web compose window in new tab after slight delay if mailto isn't default
         setTimeout(() => {
           window.open(gmailWebUrl, '_blank');
         }, 800);
@@ -561,8 +556,8 @@ ${fullName}`;
     });
   }
 
-  // Scroll Reveal Observer
-  const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  // Scroll Reveal Observer (including Cinematic Reveal)
+  const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .cinematic-reveal');
 
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
@@ -572,8 +567,8 @@ ${fullName}`;
       }
     });
   }, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
   });
 
   revealElements.forEach(el => revealObserver.observe(el));
