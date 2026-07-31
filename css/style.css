@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Premium Luxury Black & White Design System (Enhanced v6)
+   Harsh Portfolio - Premium Luxury Black & White Design System (Enhanced v7)
    ========================================================================== */
 
 :root {
@@ -37,6 +37,24 @@
   --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Time-based Theme Variations */
+body.theme-morning {
+  --bg-primary: #060911;
+  --bg-secondary: #0d121f;
+  --border-glow: rgba(186, 230, 253, 0.4);
+}
+
+body.theme-sunset {
+  --bg-primary: #0f0a12;
+  --bg-secondary: #180f1d;
+  --border-glow: rgba(251, 146, 60, 0.4);
+}
+
+body.theme-night {
+  --bg-primary: #050507;
+  --bg-secondary: #0b0b10;
+}
+
 /* Hide Default Cursor on Desktop Fine Pointers */
 @media (hover: hover) and (pointer: fine) {
   body, a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .social-icon, .spec-item, .skill-card {
@@ -66,6 +84,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
+  transition: background-color 1s ease;
 }
 
 /* Custom Scrollbar */
@@ -87,6 +106,186 @@ body {
 ::selection {
   background: var(--text-primary);
   color: var(--bg-primary);
+}
+
+/* ==========================================================================
+   SLOW-MOVING AURORA BACKGROUND ANIMATION
+   ========================================================================== */
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15), transparent 40%),
+              radial-gradient(circle at 80% 30%, rgba(168, 85, 247, 0.12), transparent 45%),
+              radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.08), transparent 50%);
+  filter: blur(60px);
+  animation: auroraFlow 16s ease-in-out infinite alternate;
+}
+
+@keyframes auroraFlow {
+  0% { transform: scale(1) rotate(0deg); opacity: 0.25; }
+  50% { transform: scale(1.1) rotate(3deg); opacity: 0.45; }
+  100% { transform: scale(1.05) rotate(-3deg); opacity: 0.3; }
+}
+
+/* ==========================================================================
+   TOP SCROLL PROGRESS INDICATOR & FLYING SCROLL BUTTERFLY
+   ========================================================================== */
+
+#scroll-progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 99999;
+}
+
+#scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ffffff 0%, #cbd5e1 50%, #ffffff 100%);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+  transition: width 0.1s ease-out;
+}
+
+#scroll-butterfly-indicator {
+  position: fixed;
+  top: -10px;
+  left: 0%;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 100000;
+  transform: translate(-50%, 0) rotate(90deg);
+  transition: left 0.1s ease-out;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+}
+
+#scroll-butterfly-indicator svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   CINEMATIC HERO LIGHT BEAMS
+   ========================================================================== */
+
+.hero-light-beam {
+  position: absolute;
+  top: -20%;
+  left: 30%;
+  width: 400px;
+  height: 800px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+  transform: rotate(-35deg);
+  pointer-events: none;
+  filter: blur(40px);
+  animation: beamGlow 7s ease-in-out infinite alternate;
+}
+
+@keyframes beamGlow {
+  0% { opacity: 0.2; transform: rotate(-35deg) translateY(0); }
+  100% { opacity: 0.5; transform: rotate(-32deg) translateY(-30px); }
+}
+
+/* ==========================================================================
+   IDLE BUTTERFLY LANDING ANIMATION
+   ========================================================================== */
+
+#landing-butterfly {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+
+#landing-butterfly.resting {
+  opacity: 1;
+}
+
+#landing-butterfly.resting .wing-left {
+  animation: gentleRestWingLeft 1.2s ease-in-out infinite alternate;
+}
+
+#landing-butterfly.resting .wing-right {
+  animation: gentleRestWingRight 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes gentleRestWingLeft {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-35deg); }
+}
+
+@keyframes gentleRestWingRight {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(35deg); }
+}
+
+/* Sound Toggle Button */
+.sound-toggle-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(10px);
+}
+
+.sound-toggle-btn:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  transform: scale(1.08);
+}
+
+/* Easter Egg Thank-You Modal */
+#easter-egg-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(24px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  padding: 1.5rem;
+}
+
+#easter-egg-modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.easter-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.9), 0 0 40px rgba(255,255,255,0.2);
+  position: relative;
 }
 
 /* ==========================================================================
@@ -596,76 +795,6 @@ body {
   padding: 0 1.5rem;
   position: relative;
   z-index: 1;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  color: var(--text-primary);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.section-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 1.2rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: 1.2rem;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  transition: all var(--transition-normal);
-}
-
-.section-tag:hover {
-  border-color: var(--border-glow);
-  color: var(--text-primary);
-  transform: translateY(-2px);
-}
-
-.section-tag i {
-  color: var(--text-primary);
-  font-size: 0.8rem;
-}
-
-.section-title {
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-  letter-spacing: -0.02em;
-  margin-bottom: 1rem;
-}
-
-.section-description {
-  color: var(--text-secondary);
-  font-size: 1.15rem;
-  max-width: 620px;
-  margin: 0 auto 3.5rem auto;
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 40%, #94a3b8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-}
-
-.text-shimmer {
-  background: linear-gradient(90deg, #ffffff 0%, #a1a1aa 25%, #ffffff 50%, #a1a1aa 75%, #ffffff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: textShimmerAnim 4s linear infinite;
-}
-
-@keyframes textShimmerAnim {
-  to { background-position: 200% center; }
 }
 
 /* Buttons */

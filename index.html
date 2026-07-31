@@ -25,11 +25,41 @@
 </head>
 <body>
 
+  <!-- Top Scroll Progress Bar & Flying Scroll Butterfly -->
+  <div id="scroll-progress-container">
+    <div id="scroll-progress-bar"></div>
+  </div>
+  <div id="scroll-butterfly-indicator">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 50,45 C 30,10 5,20 10,48 C 15,62 38,58 50,48 Z" fill="#ffffff" />
+      <path d="M 50,45 C 70,10 95,20 90,48 C 85,62 62,58 50,48 Z" fill="#ffffff" />
+      <ellipse cx="50" cy="50" rx="3" ry="14" fill="#ffffff" />
+    </svg>
+  </div>
+
+  <!-- Slow-Moving Aurora Background -->
+  <div class="aurora-bg"></div>
+
   <!-- Cursor Particle Canvas -->
   <canvas id="cursor-particle-canvas"></canvas>
 
   <!-- Element Butterfly Release Container -->
   <div id="element-butterflies-container"></div>
+
+  <!-- Resting Landing Butterfly Element -->
+  <div id="landing-butterfly">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g class="wing-left">
+        <path d="M 50,45 C 30,10 5,20 10,48 C 15,62 38,58 50,48 Z" fill="#ffffff" />
+        <path d="M 48,50 C 30,55 18,72 28,85 C 38,92 48,70 48,52 Z" fill="#ffffff" />
+      </g>
+      <g class="wing-right">
+        <path d="M 50,45 C 70,10 95,20 90,48 C 85,62 62,58 50,48 Z" fill="#ffffff" />
+        <path d="M 52,50 C 70,55 82,72 72,85 C 62,92 52,70 52,52 Z" fill="#ffffff" />
+      </g>
+      <ellipse cx="50" cy="50" rx="3.5" ry="16" fill="#ffffff" />
+    </svg>
+  </div>
 
   <!-- Animated Butterfly Cursor -->
   <div id="butterfly-cursor">
@@ -128,6 +158,10 @@
         </ul>
 
         <div class="nav-actions">
+          <button id="sound-toggle" class="sound-toggle-btn" aria-label="Toggle Sound Effects">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+
           <a href="https://instagram.com/harsh_variayani" target="_blank" rel="noopener" class="btn btn-instagram nav-ig-btn" aria-label="Instagram">
             <i class="fa-brands fa-instagram"></i> @harsh_variayani
           </a>
@@ -142,6 +176,8 @@
 
   <!-- Hero Section -->
   <section id="home" class="hero">
+    <div class="hero-light-beam"></div>
+
     <div class="container">
       <div class="hero-grid">
         <div class="hero-text reveal-left">
@@ -716,6 +752,18 @@
         <h2 id="modalTitle" style="font-size: 1.8rem; margin-bottom: 0.8rem;">Project Title</h2>
         <p id="modalDescription" style="color: var(--text-secondary); line-height: 1.7;">Detailed description of the creative workflow and highlights.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- Easter Egg Thank-You Modal -->
+  <div id="easter-egg-modal">
+    <div class="easter-card">
+      <div style="font-size: 3rem; margin-bottom: 1rem; color: #ffffff;">🦋✨</div>
+      <h2 style="font-size: 2.2rem; margin-bottom: 0.8rem;" class="text-gradient">Thank You!</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.8rem; line-height: 1.6;">
+        Thank you for exploring Harsh's portfolio and unleashing the magical butterfly swarm! Let's collaborate to build something extraordinary together.
+      </p>
+      <button id="close-easter-modal" class="btn btn-primary">Continue Exploring</button>
     </div>
   </div>
 

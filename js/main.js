@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script (Enhanced v5)
+   Harsh Portfolio - Main Interactive Script (Enhanced v7)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,16 +11,196 @@ document.addEventListener('DOMContentLoaded', () => {
         preloader.classList.add('loaded');
       }, 700);
     });
-    // Fallback hide
     setTimeout(() => {
       preloader.classList.add('loaded');
     }, 2800);
   }
 
   // ==========================================================================
+  // TIME-BASED THEME ENGINE (MORNING / SUNSET / NIGHT)
+  // ==========================================================================
+  const currentHour = new Date().getHours();
+  if (currentHour >= 6 && currentHour < 12) {
+    document.body.classList.add('theme-morning');
+  } else if (currentHour >= 17 && currentHour < 20) {
+    document.body.classList.add('theme-sunset');
+  } else {
+    document.body.classList.add('theme-night');
+  }
+
+  // ==========================================================================
+  // SYNTHESIZED WEB AUDIO API SOUND EFFECTS & MUTE TOGGLE
+  // ==========================================================================
+  let isMuted = localStorage.getItem('harsh_portfolio_muted') === 'true';
+  const soundToggleBtn = document.getElementById('sound-toggle');
+
+  function updateSoundIcon() {
+    if (!soundToggleBtn) return;
+    const icon = soundToggleBtn.querySelector('i');
+    if (icon) {
+      icon.className = isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+    }
+  }
+  updateSoundIcon();
+
+  if (soundToggleBtn) {
+    soundToggleBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      localStorage.setItem('harsh_portfolio_muted', isMuted);
+      updateSoundIcon();
+      if (!isMuted) playSoundChime(587.33); // Play pleasant test chime D5
+    });
+  }
+
+  // Web Audio Synthesizer (No external MP3 files required)
+  let audioCtx = null;
+  function playSoundChime(freq = 523.25, type = 'sine', duration = 0.25) {
+    if (isMuted) return;
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (err) {
+      // Audio context fallback
+    }
+  }
+
+  // ==========================================================================
+  // TOP SCROLL PROGRESS INDICATOR & FLYING SCROLL BUTTERFLY
+  // ==========================================================================
+  const progressBar = document.getElementById('scroll-progress-bar');
+  const butterflyIndicator = document.getElementById('scroll-butterfly-indicator');
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+    if (progressBar) {
+      progressBar.style.width = `${scrollPercent}%`;
+    }
+    if (butterflyIndicator) {
+      butterflyIndicator.style.left = `${Math.min(98, Math.max(2, scrollPercent))}%`;
+    }
+  });
+
+  // ==========================================================================
+  // MAGNETIC CTA BUTTONS
+  // ==========================================================================
+  const magneticBtns = document.querySelectorAll('.btn, .social-icon, .contact-card-icon, .sound-toggle-btn');
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (isFinePointer) {
+    magneticBtns.forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const btnX = rect.left + rect.width / 2;
+        const btnY = rect.top + rect.height / 2;
+
+        const distX = e.clientX - btnX;
+        const distY = e.clientY - btnY;
+
+        btn.style.transform = `translate(${distX * 0.28}px, ${distY * 0.28}px) scale(1.04)`;
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0px, 0px) scale(1)';
+      });
+    });
+  }
+
+  // ==========================================================================
+  // IDLE BUTTERFLY LANDING & TAKEOFF LOOP
+  // ==========================================================================
+  const landingButterfly = document.getElementById('landing-butterfly');
+
+  function triggerIdleButterflyLanding() {
+    if (!landingButterfly || !isFinePointer) return;
+
+    // Pick target: either hero portrait card or navbar logo
+    const targets = [
+      document.querySelector('.hero-card'),
+      document.querySelector('.logo')
+    ].filter(Boolean);
+
+    if (targets.length === 0) return;
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const rect = target.getBoundingClientRect();
+
+    // Landing coordinates
+    const landX = rect.left + rect.width * (Math.random() * 0.6 + 0.2);
+    const landY = rect.top + rect.height * (Math.random() * 0.5 + 0.2);
+
+    landingButterfly.style.left = `${landX}px`;
+    landingButterfly.style.top = `${landY}px`;
+    landingButterfly.classList.add('resting');
+
+    playSoundChime(659.25, 'sine', 0.2); // Soft E5 tone
+
+    // Rest for 4.5s then fly off
+    setTimeout(() => {
+      landingButterfly.style.transform = `translate(${(Math.random() - 0.5) * 300}px, -300px) scale(0.2) rotate(45deg)`;
+      landingButterfly.style.opacity = '0';
+
+      setTimeout(() => {
+        landingButterfly.classList.remove('resting');
+        landingButterfly.style.transform = 'none';
+      }, 1000);
+    }, 4500);
+  }
+
+  // Run idle landing loop every 24s
+  setInterval(triggerIdleButterflyLanding, 24000);
+  setTimeout(triggerIdleButterflyLanding, 6000); // Initial landing after 6s
+
+  // ==========================================================================
+  // EASTER EGG BUTTERFLY SWARM & CLICK COUNTER
+  // ==========================================================================
+  let butterflyClickCount = 0;
+  const easterModal = document.getElementById('easter-egg-modal');
+  const closeEasterBtn = document.getElementById('close-easter-modal');
+
+  function triggerButterflySwarm() {
+    playSoundChime(880, 'triangle', 0.5); // High A5 chime
+    for (let i = 0; i < 32; i++) {
+      setTimeout(() => {
+        if (window.spawnButterfliesFromElement) {
+          window.spawnButterfliesFromElement(document.body, 1);
+        }
+      }, i * 60);
+    }
+    if (easterModal) {
+      easterModal.classList.add('open');
+    }
+  }
+
+  if (closeEasterBtn && easterModal) {
+    closeEasterBtn.addEventListener('click', () => {
+      easterModal.classList.remove('open');
+    });
+  }
+
+  // ==========================================================================
   // ANIMATED BUTTERFLY CURSOR & PARTICLES ENGINE (DESKTOP ONLY)
   // ==========================================================================
-  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const butterflyCursor = document.getElementById('butterfly-cursor');
   const particleCanvas = document.getElementById('cursor-particle-canvas');
   const elementButterfliesContainer = document.getElementById('element-butterflies-container');
@@ -43,15 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAngle = 0;
 
     const particles = [];
-    const maxParticles = 80;
+    const maxParticles = 90;
 
-    // Track Mouse
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
     });
 
-    // Particle Class
     class SparkleParticle {
       constructor(x, y, isBurst = false) {
         this.x = x;
@@ -59,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.isBurst = isBurst;
         
         if (isBurst) {
-          const speed = Math.random() * 4 + 1.5;
+          const speed = Math.random() * 4.5 + 1.8;
           const rad = Math.random() * Math.PI * 2;
           this.vx = Math.cos(rad) * speed;
           this.vy = Math.sin(rad) * speed;
@@ -94,23 +272,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Click Dust Burst
+    // Global Click Burst & Audio Chime
     window.addEventListener('mousedown', (e) => {
-      for (let i = 0; i < 14; i++) {
+      playSoundChime(440 + Math.random() * 200, 'sine', 0.2); // Random pitch click sound
+
+      for (let i = 0; i < 16; i++) {
         particles.push(new SparkleParticle(e.clientX, e.clientY, true));
       }
     });
 
-    // ==========================================================================
-    // ELEMENT BUTTERFLY RELEASE ENGINE
-    // ==========================================================================
+    // Element Butterfly Release Engine
     const releasedButterflies = [];
-    const maxReleasedButterflies = 28;
+    const maxReleasedButterflies = 32;
 
     function createReleasedButterfly(originX, originY) {
       if (!elementButterfliesContainer) return;
 
-      const size = Math.floor(Math.random() * 14 + 20); // 20px to 34px
+      const size = Math.floor(Math.random() * 14 + 20);
       const el = document.createElement('div');
       el.className = 'flying-element-butterfly';
       el.style.width = `${size}px`;
@@ -163,16 +341,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    function spawnButterfliesFromElement(element, count = 5) {
-      const rect = element.getBoundingClientRect();
+    window.spawnButterfliesFromElement = function(element, count = 5) {
+      const rect = element.getBoundingClientRect ? element.getBoundingClientRect() : { left: width/2, top: height/2, width: 0, height: 0 };
       for (let i = 0; i < count; i++) {
-        const originX = rect.left + Math.random() * rect.width;
-        const originY = rect.top + Math.random() * rect.height;
+        const originX = rect.left + Math.random() * (rect.width || 100);
+        const originY = rect.top + Math.random() * (rect.height || 100);
         createReleasedButterfly(originX, originY);
       }
-    }
+    };
 
-    // Attach Release Listeners to Interactive Elements
+    // Attach Release Listeners
     const interactiveSelectors = 'a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .social-icon, .spec-item, .skill-card';
     const interactives = document.querySelectorAll(interactiveSelectors);
 
@@ -183,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         butterflyCursor.classList.add('hovering');
         if (!hoverThrottled) {
           hoverThrottled = true;
-          spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 4));
+          window.spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 4));
           setTimeout(() => { hoverThrottled = false; }, 800);
         }
       });
@@ -193,22 +371,26 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       el.addEventListener('click', () => {
-        spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5));
+        window.spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5));
+
+        // Easter egg click counter
+        butterflyClickCount++;
+        if (butterflyClickCount === 5) {
+          triggerButterflySwarm();
+        }
       });
     });
 
-    // 60 FPS Render Loop
+    // Render Loop
     function renderLoop(time) {
       ctx.clearRect(0, 0, width, height);
 
-      // Smooth Easing Position
       const dx = mouseX - currentX;
       const dy = mouseY - currentY;
 
       currentX += dx * 0.18;
       currentY += dy * 0.18;
 
-      // Smooth Rotation in Direction of Flight
       const speed = Math.sqrt(dx * dx + dy * dy);
       if (speed > 1.5) {
         angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
@@ -218,17 +400,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentAngle += angleDiff * 0.15;
       }
 
-      // Update Butterfly Cursor Element
       butterflyCursor.style.left = `${currentX}px`;
       butterflyCursor.style.top = `${currentY}px`;
       butterflyCursor.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg) scale(${butterflyCursor.classList.contains('hovering') ? 1.38 : 1})`;
 
-      // Spawn Trail Particles on Cursor Movement
       if (speed > 2 && Math.random() < 0.6) {
         particles.push(new SparkleParticle(currentX + (Math.random() - 0.5) * 10, currentY + (Math.random() - 0.5) * 10));
       }
 
-      // Update & Render Released Element Butterflies
       for (let i = releasedButterflies.length - 1; i >= 0; i--) {
         const b = releasedButterflies[i];
         b.time += 1;
@@ -257,7 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Render Particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.update();
@@ -277,35 +455,24 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(renderLoop);
   }
 
-  // Mouse Spotlight Cursor Glow Position Listener
+  // Mouse Spotlight Cursor Glow & Hero Parallax
   const cursorGlow = document.querySelector('.cursor-glow');
-  if (cursorGlow) {
-    window.addEventListener('mousemove', (e) => {
+  const heroText = document.querySelector('.hero-text');
+  const heroCard = document.querySelector('.hero-card');
+
+  window.addEventListener('mousemove', (e) => {
+    if (cursorGlow) {
       cursorGlow.style.left = `${e.clientX}px`;
       cursorGlow.style.top = `${e.clientY}px`;
-    });
-  }
+    }
 
-  // Card 3D Tilt Effect on Mousemove
-  const tiltCards = document.querySelectorAll('.hero-card, .service-card, .portfolio-item, .contact-card');
-  tiltCards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      const rotateX = (y - centerY) / 25;
-      const rotateY = (centerX - x) / 25;
-      
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
-    });
+    // Hero Cursor Parallax
+    if (heroText && heroCard && isFinePointer) {
+      const moveX = (e.clientX - window.innerWidth / 2) * 0.015;
+      const moveY = (e.clientY - window.innerHeight / 2) * 0.015;
+      heroText.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      heroCard.style.transform = `translate(${-moveX * 1.5}px, ${-moveY * 1.5}px)`;
+    }
   });
 
   // Header Scroll Effect & Mobile Nav
@@ -469,23 +636,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const budget = document.getElementById('budget').value;
       const details = document.getElementById('projectDetails').value.trim();
 
-      // Form Validation
       if (!fullName || !email || !phone || !projectType || !budget || !details) {
         showToast('Please fill in all required fields marked with *');
         return;
       }
 
-      // Email Format Check
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         showToast('Please enter a valid email address');
         return;
       }
 
-      // Target Recipient Email
       const targetEmail = 'harshvariyani24@gmail.com';
-
-      // Build Mail Subject & Body exactly as requested
       const subject = `New Project Inquiry - ${fullName}`;
       const body = `Dear Harsh,
 
@@ -508,19 +670,14 @@ Looking forward to your response.
 Regards,
 ${fullName}`;
 
-      // Encode URI Component
       const encodedSubject = encodeURIComponent(subject);
       const encodedBody = encodeURIComponent(body);
 
-      // Create Mailto URL
       const mailtoUrl = `mailto:${targetEmail}?subject=${encodedSubject}&body=${encodedBody}`;
-
-      // Create Direct Gmail Web URL Fallback
       const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${targetEmail}&su=${encodedSubject}&body=${encodedBody}`;
 
       showToast('Opening Gmail with your inquiry details...');
 
-      // Attempt Mailto
       setTimeout(() => {
         window.location.href = mailtoUrl;
         setTimeout(() => {
@@ -556,7 +713,7 @@ ${fullName}`;
     });
   }
 
-  // Scroll Reveal Observer (including Cinematic Reveal)
+  // Scroll Reveal Observer
   const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .cinematic-reveal');
 
   const revealObserver = new IntersectionObserver((entries, observer) => {
