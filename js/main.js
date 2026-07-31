@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script (Enhanced v7)
+   Harsh Portfolio - Main Interactive Script (Enhanced v8)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +14,119 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       preloader.classList.add('loaded');
     }, 2800);
+  }
+
+  // ==========================================================================
+  // REALISTIC ANIMATED GALAXY BACKGROUND CANVAS ENGINE
+  // ==========================================================================
+  const galaxyCanvas = document.getElementById('galaxy-bg-canvas');
+  if (galaxyCanvas) {
+    const gCtx = galaxyCanvas.getContext('2d');
+    let gWidth = (galaxyCanvas.width = window.innerWidth);
+    let gHeight = (galaxyCanvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      gWidth = galaxyCanvas.width = window.innerWidth;
+      gHeight = galaxyCanvas.height = window.innerHeight;
+    });
+
+    let gMouseX = gWidth / 2;
+    let gMouseY = gHeight / 2;
+
+    window.addEventListener('mousemove', (e) => {
+      gMouseX = e.clientX;
+      gMouseY = e.clientY;
+    });
+
+    // Star Object
+    class Star {
+      constructor() {
+        this.x = Math.random() * gWidth;
+        this.y = Math.random() * gHeight;
+        this.size = Math.random() * 2 + 0.6;
+        this.baseAlpha = Math.random() * 0.7 + 0.3;
+        this.alpha = this.baseAlpha;
+        this.twinkleSpeed = Math.random() * 0.03 + 0.01;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0) this.x = gWidth;
+        if (this.x > gWidth) this.x = 0;
+        if (this.y < 0) this.y = gHeight;
+        if (this.y > gHeight) this.y = 0;
+
+        this.alpha = this.baseAlpha + Math.sin(Date.now() * this.twinkleSpeed) * 0.25;
+      }
+
+      draw(context, offsetX, offsetY) {
+        context.save();
+        context.globalAlpha = Math.max(0.1, Math.min(1, this.alpha));
+        context.fillStyle = '#ffffff';
+        context.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        context.shadowBlur = this.size * 3;
+        context.beginPath();
+        context.arc(this.x + offsetX, this.y + offsetY, this.size, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      }
+    }
+
+    const stars = Array.from({ length: 130 }, () => new Star());
+
+    function renderGalaxy() {
+      gCtx.clearRect(0, 0, gWidth, gHeight);
+
+      // Subtle Cursor Parallax Offset
+      const offsetX = (gMouseX - gWidth / 2) * 0.02;
+      const offsetY = (gMouseY - gHeight / 2) * 0.02;
+
+      // Soft Ambient Nebula Glow Gradient
+      const nebulaGrad = gCtx.createRadialGradient(
+        gWidth * 0.3 + offsetX, gHeight * 0.4 + offsetY, 50,
+        gWidth * 0.3 + offsetX, gHeight * 0.4 + offsetY, gWidth * 0.6
+      );
+      nebulaGrad.addColorStop(0, 'rgba(99, 102, 241, 0.07)');
+      nebulaGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.04)');
+      nebulaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      gCtx.fillStyle = nebulaGrad;
+      gCtx.fillRect(0, 0, gWidth, gHeight);
+
+      // Render Constellation Connections
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x;
+          const dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100) {
+            gCtx.save();
+            gCtx.globalAlpha = (1 - dist / 100) * 0.18;
+            gCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            gCtx.lineWidth = 0.6;
+            gCtx.beginPath();
+            gCtx.moveTo(stars[i].x + offsetX, stars[i].y + offsetY);
+            gCtx.lineTo(stars[j].x + offsetX, stars[j].y + offsetY);
+            gCtx.stroke();
+            gCtx.restore();
+          }
+        }
+      }
+
+      // Update and Draw Stars
+      stars.forEach(star => {
+        star.update();
+        star.draw(gCtx, offsetX, offsetY);
+      });
+
+      requestAnimationFrame(renderGalaxy);
+    }
+
+    requestAnimationFrame(renderGalaxy);
   }
 
   // ==========================================================================
@@ -48,11 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
       isMuted = !isMuted;
       localStorage.setItem('harsh_portfolio_muted', isMuted);
       updateSoundIcon();
-      if (!isMuted) playSoundChime(587.33); // Play pleasant test chime D5
+      if (!isMuted) playSoundChime(587.33);
     });
   }
 
-  // Web Audio Synthesizer (No external MP3 files required)
   let audioCtx = null;
   function playSoundChime(freq = 523.25, type = 'sine', duration = 0.25) {
     if (isMuted) return;
@@ -79,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     } catch (err) {
-      // Audio context fallback
+      // Fallback
     }
   }
 
@@ -135,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function triggerIdleButterflyLanding() {
     if (!landingButterfly || !isFinePointer) return;
 
-    // Pick target: either hero portrait card or navbar logo
     const targets = [
       document.querySelector('.hero-card'),
       document.querySelector('.logo')
@@ -145,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const target = targets[Math.floor(Math.random() * targets.length)];
     const rect = target.getBoundingClientRect();
 
-    // Landing coordinates
     const landX = rect.left + rect.width * (Math.random() * 0.6 + 0.2);
     const landY = rect.top + rect.height * (Math.random() * 0.5 + 0.2);
 
@@ -153,9 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
     landingButterfly.style.top = `${landY}px`;
     landingButterfly.classList.add('resting');
 
-    playSoundChime(659.25, 'sine', 0.2); // Soft E5 tone
+    playSoundChime(659.25, 'sine', 0.2);
 
-    // Rest for 4.5s then fly off
     setTimeout(() => {
       landingButterfly.style.transform = `translate(${(Math.random() - 0.5) * 300}px, -300px) scale(0.2) rotate(45deg)`;
       landingButterfly.style.opacity = '0';
@@ -167,9 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4500);
   }
 
-  // Run idle landing loop every 24s
   setInterval(triggerIdleButterflyLanding, 24000);
-  setTimeout(triggerIdleButterflyLanding, 6000); // Initial landing after 6s
+  setTimeout(triggerIdleButterflyLanding, 6000);
 
   // ==========================================================================
   // EASTER EGG BUTTERFLY SWARM & CLICK COUNTER
@@ -179,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeEasterBtn = document.getElementById('close-easter-modal');
 
   function triggerButterflySwarm() {
-    playSoundChime(880, 'triangle', 0.5); // High A5 chime
+    playSoundChime(880, 'triangle', 0.5);
     for (let i = 0; i < 32; i++) {
       setTimeout(() => {
         if (window.spawnButterfliesFromElement) {
@@ -272,16 +380,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Global Click Burst & Audio Chime
     window.addEventListener('mousedown', (e) => {
-      playSoundChime(440 + Math.random() * 200, 'sine', 0.2); // Random pitch click sound
+      playSoundChime(440 + Math.random() * 200, 'sine', 0.2);
 
       for (let i = 0; i < 16; i++) {
         particles.push(new SparkleParticle(e.clientX, e.clientY, true));
       }
     });
 
-    // Element Butterfly Release Engine
     const releasedButterflies = [];
     const maxReleasedButterflies = 32;
 
@@ -350,7 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // Attach Release Listeners
     const interactiveSelectors = 'a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .social-icon, .spec-item, .skill-card';
     const interactives = document.querySelectorAll(interactiveSelectors);
 
@@ -373,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
       el.addEventListener('click', () => {
         window.spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5));
 
-        // Easter egg click counter
         butterflyClickCount++;
         if (butterflyClickCount === 5) {
           triggerButterflySwarm();
@@ -381,7 +485,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Render Loop
     function renderLoop(time) {
       ctx.clearRect(0, 0, width, height);
 
@@ -466,7 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
       cursorGlow.style.top = `${e.clientY}px`;
     }
 
-    // Hero Cursor Parallax
     if (heroText && heroCard && isFinePointer) {
       const moveX = (e.clientX - window.innerWidth / 2) * 0.015;
       const moveY = (e.clientY - window.innerHeight / 2) * 0.015;
