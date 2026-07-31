@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script (Enhanced v3)
+   Harsh Portfolio - Main Interactive Script (Enhanced v4)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const butterflyCursor = document.getElementById('butterfly-cursor');
   const particleCanvas = document.getElementById('cursor-particle-canvas');
+  const elementButterfliesContainer = document.getElementById('element-butterflies-container');
 
   if (isFinePointer && butterflyCursor && particleCanvas) {
     const ctx = particleCanvas.getContext('2d');
@@ -42,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAngle = 0;
 
     const particles = [];
-    const maxParticles = 60;
+    const maxParticles = 80;
 
     // Track Mouse
     window.addEventListener('mousemove', (e) => {
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
           this.decay = Math.random() * 0.03 + 0.02;
         } else {
           this.vx = (Math.random() - 0.5) * 1.2;
-          this.vy = Math.random() * 1.5 + 0.5; // slow float down
+          this.vy = Math.random() * 1.5 + 0.5;
           this.size = Math.random() * 2.5 + 1;
           this.alpha = Math.random() * 0.7 + 0.3;
           this.decay = Math.random() * 0.025 + 0.015;
@@ -100,21 +101,104 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Hover Detection for Interactive Elements
-    const interactiveSelectors = 'a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .spec-item, .skill-card';
+    // ==========================================================================
+    // ELEMENT BUTTERFLY RELEASE ENGINE
+    // ==========================================================================
+    const releasedButterflies = [];
+    const maxReleasedButterflies = 28;
+
+    function createReleasedButterfly(originX, originY) {
+      if (!elementButterfliesContainer) return;
+
+      const size = Math.floor(Math.random() * 14 + 20); // 20px to 34px
+      const el = document.createElement('div');
+      el.className = 'flying-element-butterfly';
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+
+      el.innerHTML = `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="eWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+            <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.6" />
+          </linearGradient>
+        </defs>
+        <g class="element-wing-left">
+          <path d="M 50,45 C 30,10 5,20 10,48 C 15,62 38,58 50,48 Z" fill="url(#eWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+          <path d="M 48,50 C 30,55 18,72 28,85 C 38,92 48,70 48,52 Z" fill="url(#eWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+        </g>
+        <g class="element-wing-right">
+          <path d="M 50,45 C 70,10 95,20 90,48 C 85,62 62,58 50,48 Z" fill="url(#eWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+          <path d="M 52,50 C 70,55 82,72 72,85 C 62,92 52,70 52,52 Z" fill="url(#eWingGrad)" stroke="#ffffff" stroke-width="1.5" />
+        </g>
+        <ellipse cx="50" cy="50" rx="3" ry="14" fill="#ffffff" />
+      </svg>`;
+
+      elementButterfliesContainer.appendChild(el);
+
+      const angleRad = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 2.2 + 1.6;
+
+      const obj = {
+        dom: el,
+        x: originX,
+        y: originY,
+        vx: Math.cos(angleRad) * speed,
+        vy: Math.sin(angleRad) * speed - 0.8, // slight upward float bias
+        wobbleFreq: Math.random() * 0.08 + 0.04,
+        wobbleAmp: Math.random() * 3 + 1.5,
+        life: Math.floor(Math.random() * 90 + 110), // ~2.2s to ~3.5s
+        maxLife: 200,
+        time: 0
+      };
+
+      obj.maxLife = obj.life;
+      releasedButterflies.push(obj);
+
+      // Limit active butterflies
+      if (releasedButterflies.length > maxReleasedButterflies) {
+        const oldest = releasedButterflies.shift();
+        if (oldest && oldest.dom && oldest.dom.parentNode) {
+          oldest.dom.parentNode.removeChild(oldest.dom);
+        }
+      }
+    }
+
+    function spawnButterfliesFromElement(element, count = 5) {
+      const rect = element.getBoundingClientRect();
+      for (let i = 0; i < count; i++) {
+        const originX = rect.left + Math.random() * rect.width;
+        const originY = rect.top + Math.random() * rect.height;
+        createReleasedButterfly(originX, originY);
+      }
+    }
+
+    // Attach Release Listeners to Interactive Elements
+    const interactiveSelectors = 'a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .social-icon, .spec-item, .skill-card';
     const interactives = document.querySelectorAll(interactiveSelectors);
 
     interactives.forEach(el => {
+      let hoverThrottled = false;
+
       el.addEventListener('mouseenter', () => {
         butterflyCursor.classList.add('hovering');
+        if (!hoverThrottled) {
+          hoverThrottled = true;
+          spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 4)); // 4 to 5 butterflies
+          setTimeout(() => { hoverThrottled = false; }, 800);
+        }
       });
+
       el.addEventListener('mouseleave', () => {
         butterflyCursor.classList.remove('hovering');
+      });
+
+      el.addEventListener('click', () => {
+        spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5)); // 5 to 6 butterflies on click
       });
     });
 
     // 60 FPS Render Loop
-    let lastTime = 0;
     function renderLoop(time) {
       ctx.clearRect(0, 0, width, height);
 
@@ -130,20 +214,49 @@ document.addEventListener('DOMContentLoaded', () => {
       if (speed > 1.5) {
         angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
         let angleDiff = angle - currentAngle;
-        // Normalize angle
         while (angleDiff > 180) angleDiff -= 360;
         while (angleDiff < -180) angleDiff += 360;
         currentAngle += angleDiff * 0.15;
       }
 
-      // Update Butterfly Element Position & Rotation
+      // Update Butterfly Cursor Element
       butterflyCursor.style.left = `${currentX}px`;
       butterflyCursor.style.top = `${currentY}px`;
       butterflyCursor.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg) scale(${butterflyCursor.classList.contains('hovering') ? 1.38 : 1})`;
 
-      // Spawn Trail Particles on Movement
+      // Spawn Trail Particles on Cursor Movement
       if (speed > 2 && Math.random() < 0.6) {
         particles.push(new SparkleParticle(currentX + (Math.random() - 0.5) * 10, currentY + (Math.random() - 0.5) * 10));
+      }
+
+      // Update & Render Released Element Butterflies
+      for (let i = releasedButterflies.length - 1; i >= 0; i--) {
+        const b = releasedButterflies[i];
+        b.time += 1;
+        b.life -= 1;
+
+        b.x += b.vx + Math.sin(b.time * b.wobbleFreq) * b.wobbleAmp;
+        b.y += b.vy + Math.cos(b.time * b.wobbleFreq * 0.7) * (b.wobbleAmp * 0.5);
+
+        const heading = Math.atan2(b.vy, b.vx) * (180 / Math.PI) + 90;
+        const opacity = Math.max(0, b.life / b.maxLife);
+
+        b.dom.style.left = `${b.x}px`;
+        b.dom.style.top = `${b.y}px`;
+        b.dom.style.transform = `translate(-50%, -50%) rotate(${heading}deg) scale(${opacity * 0.5 + 0.5})`;
+        b.dom.style.opacity = opacity;
+
+        // Spawn Sparkle Trail for Flying Element Butterflies
+        if (Math.random() < 0.4) {
+          particles.push(new SparkleParticle(b.x, b.y));
+        }
+
+        if (b.life <= 0) {
+          if (b.dom && b.dom.parentNode) {
+            b.dom.parentNode.removeChild(b.dom);
+          }
+          releasedButterflies.splice(i, 1);
+        }
       }
 
       // Render Particles

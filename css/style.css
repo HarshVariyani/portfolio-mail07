@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Premium Luxury Black & White Design System (Enhanced v3)
+   Harsh Portfolio - Premium Luxury Black & White Design System (Enhanced v4)
    ========================================================================== */
 
 :root {
@@ -39,7 +39,7 @@
 
 /* Hide Default Cursor on Desktop Fine Pointers */
 @media (hover: hover) and (pointer: fine) {
-  body, a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn {
+  body, a, button, input, select, textarea, .portfolio-item, .service-card, .contact-card, .filter-btn, .portfolio-view-btn, .social-icon, .spec-item, .skill-card {
     cursor: none !important;
   }
 }
@@ -90,9 +90,10 @@ body {
 }
 
 /* ==========================================================================
-   ANIMATED BUTTERFLY CURSOR & PARTICLES
+   ANIMATED BUTTERFLY CURSOR & RELEASED BUTTERFLIES
    ========================================================================== */
 
+/* Cursor Butterfly */
 #butterfly-cursor {
   position: fixed;
   top: 0;
@@ -165,6 +166,47 @@ body {
 
 #butterfly-cursor.hovering .wing-right {
   animation-duration: 0.16s;
+}
+
+/* Element Butterfly Release Container */
+#element-butterflies-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999997;
+  overflow: hidden;
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #element-butterflies-container {
+    display: block;
+  }
+}
+
+.flying-element-butterfly {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  perspective: 400px;
+}
+
+.flying-element-butterfly svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+}
+
+.element-wing-left {
+  transform-origin: right center;
+  animation: flapWingLeft 0.22s ease-in-out infinite alternate;
+}
+
+.element-wing-right {
+  transform-origin: left center;
+  animation: flapWingRight 0.22s ease-in-out infinite alternate;
 }
 
 /* Cursor Trail Particles Canvas */
