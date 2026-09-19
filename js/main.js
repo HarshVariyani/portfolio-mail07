@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Main Interactive Script (Enhanced v8)
+   Harsh Portfolio - Main Interactive Script (Enhanced v10)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // MAGNETIC CTA BUTTONS
   // ==========================================================================
-  const magneticBtns = document.querySelectorAll('.btn, .social-icon, .contact-card-icon, .sound-toggle-btn');
+  const magneticBtns = document.querySelectorAll('.btn, .social-icon, .contact-card-icon, .sound-toggle-btn, .back-to-top');
   const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   if (isFinePointer) {
@@ -231,73 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('mouseleave', () => {
         btn.style.transform = 'translate(0px, 0px) scale(1)';
       });
-    });
-  }
-
-  // ==========================================================================
-  // IDLE BUTTERFLY LANDING & TAKEOFF LOOP
-  // ==========================================================================
-  const landingButterfly = document.getElementById('landing-butterfly');
-
-  function triggerIdleButterflyLanding() {
-    if (!landingButterfly || !isFinePointer) return;
-
-    const targets = [
-      document.querySelector('.hero-card'),
-      document.querySelector('.logo')
-    ].filter(Boolean);
-
-    if (targets.length === 0) return;
-    const target = targets[Math.floor(Math.random() * targets.length)];
-    const rect = target.getBoundingClientRect();
-
-    const landX = rect.left + rect.width * (Math.random() * 0.6 + 0.2);
-    const landY = rect.top + rect.height * (Math.random() * 0.5 + 0.2);
-
-    landingButterfly.style.left = `${landX}px`;
-    landingButterfly.style.top = `${landY}px`;
-    landingButterfly.classList.add('resting');
-
-    playSoundChime(659.25, 'sine', 0.2);
-
-    setTimeout(() => {
-      landingButterfly.style.transform = `translate(${(Math.random() - 0.5) * 300}px, -300px) scale(0.2) rotate(45deg)`;
-      landingButterfly.style.opacity = '0';
-
-      setTimeout(() => {
-        landingButterfly.classList.remove('resting');
-        landingButterfly.style.transform = 'none';
-      }, 1000);
-    }, 4500);
-  }
-
-  setInterval(triggerIdleButterflyLanding, 24000);
-  setTimeout(triggerIdleButterflyLanding, 6000);
-
-  // ==========================================================================
-  // EASTER EGG BUTTERFLY SWARM & CLICK COUNTER
-  // ==========================================================================
-  let butterflyClickCount = 0;
-  const easterModal = document.getElementById('easter-egg-modal');
-  const closeEasterBtn = document.getElementById('close-easter-modal');
-
-  function triggerButterflySwarm() {
-    playSoundChime(880, 'triangle', 0.5);
-    for (let i = 0; i < 32; i++) {
-      setTimeout(() => {
-        if (window.spawnButterfliesFromElement) {
-          window.spawnButterfliesFromElement(document.body, 1);
-        }
-      }, i * 60);
-    }
-    if (easterModal) {
-      easterModal.classList.add('open');
-    }
-  }
-
-  if (closeEasterBtn && easterModal) {
-    closeEasterBtn.addEventListener('click', () => {
-      easterModal.classList.remove('open');
     });
   }
 
@@ -489,11 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       el.addEventListener('click', () => {
         window.spawnButterfliesFromElement(el, Math.floor(Math.random() * 2 + 5));
-
-        butterflyClickCount++;
-        if (butterflyClickCount === 5) {
-          triggerButterflySwarm();
-        }
       });
     });
 
@@ -740,23 +668,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Contact Form Mailto Handler
+  // Contact Form Express API Handler with Mailto Fallback
   const contactForm = document.getElementById('contactForm');
   const toast = document.getElementById('toastNotice');
 
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const fullName = document.getElementById('fullName').value.trim();
-      const company = document.getElementById('companyName').value.trim() || 'N/A';
+      const companyName = document.getElementById('companyName').value.trim() || 'N/A';
       const email = document.getElementById('email').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const projectType = document.getElementById('projectType').value;
       const budget = document.getElementById('budget').value;
-      const details = document.getElementById('projectDetails').value.trim();
+      const projectDetails = document.getElementById('projectDetails').value.trim();
 
-      if (!fullName || !email || !phone || !projectType || !budget || !details) {
+      if (!fullName || !email || !phone || !projectType || !budget || !projectDetails) {
         showToast('Please fill in all required fields marked with *');
         return;
       }
@@ -767,14 +695,63 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const targetEmail = 'harshvariyani24@gmail.com';
-      const subject = `New Project Inquiry - ${fullName}`;
-      const body = `Dear Harsh,
+      const submitBtn = contactForm.querySelector('.form-submit-btn');
+      const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+      }
+
+      const backendApiUrl = 'http://localhost:5000/api/contact';
+
+      try {
+        const response = await fetch(backendApiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fullName,
+            companyName,
+            email,
+            phone,
+            projectType,
+            budget,
+            projectDetails
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          showToast('✨ Inquiry submitted successfully! Harsh will reach out to you shortly.');
+          contactForm.reset();
+          playSoundChime(880, 'sine', 0.4);
+        } else {
+          showToast(data.message || 'Submission failed. Opening mail app fallback...');
+          triggerMailtoFallback(fullName, companyName, email, phone, projectType, budget, projectDetails);
+        }
+      } catch (err) {
+        console.warn('Express Backend API unreachable. Triggering mailto fallback.', err);
+        showToast('Connecting via Mail client fallback...');
+        triggerMailtoFallback(fullName, companyName, email, phone, projectType, budget, projectDetails);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }
+      }
+    });
+  }
+
+  function triggerMailtoFallback(fullName, company, email, phone, projectType, budget, details) {
+    const targetEmail = 'harshvariyani24@gmail.com';
+    const subject = `New Project Inquiry - ${fullName}`;
+    const body = `Dear Harsh,
 
 I visited your portfolio and would like to work with you.
 
 Client Details:
-
 Name: ${fullName}
 Company: ${company}
 Email: ${email}
@@ -790,21 +767,10 @@ Looking forward to your response.
 Regards,
 ${fullName}`;
 
-      const encodedSubject = encodeURIComponent(subject);
-      const encodedBody = encodeURIComponent(body);
-
-      const mailtoUrl = `mailto:${targetEmail}?subject=${encodedSubject}&body=${encodedBody}`;
-      const gmailWebUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${targetEmail}?su=${encodedSubject}&body=${encodedBody}`;
-
-      showToast('Opening Gmail with your inquiry details...');
-
-      setTimeout(() => {
-        window.location.href = mailtoUrl;
-        setTimeout(() => {
-          window.open(gmailWebUrl, '_blank');
-        }, 800);
-      }, 500);
-    });
+    const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setTimeout(() => {
+      window.location.href = mailtoUrl;
+    }, 500);
   }
 
   function showToast(message) {
@@ -813,7 +779,7 @@ ${fullName}`;
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 4000);
+      }, 5000);
     }
   }
 

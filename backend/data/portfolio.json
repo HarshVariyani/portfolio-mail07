@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "title": "Cinematic Tech Vlog Edit",
+    "category": "video",
+    "image": "assets/images/video_editing.png",
+    "description": "Cinematic YouTube video edit featuring fast-paced cuts, sound effects, motion titles, and custom color grading."
+  },
+  {
+    "id": 2,
+    "title": "High-Fashion Portrait Retouch",
+    "category": "photo",
+    "image": "assets/images/photo_editing.png",
+    "description": "High-fashion portrait retouching with frequency separation skin smoothing and color enhancement."
+  },
+  {
+    "id": 3,
+    "title": "Luxury Fragrance Commercial",
+    "category": "product",
+    "image": "assets/images/product_editing.png",
+    "description": "Commercial product photography composition with artificial splash graphics, dynamic lighting, and reflections."
+  },
+  {
+    "id": 4,
+    "title": "Viral YouTube Thumbnail",
+    "category": "thumbnail",
+    "image": "assets/images/thumbnail_design.png",
+    "description": "High-CTR YouTube thumbnail design with custom face glow, 3D text styling, and vibrant contrast pop."
+  },
+  {
+    "id": 5,
+    "title": "Minimalist Brand Carousel",
+    "category": "social",
+    "image": "assets/images/social_media.png",
+    "description": "Luxury dark mode social carousel layout designed for premium personal branding."
+  }
+]

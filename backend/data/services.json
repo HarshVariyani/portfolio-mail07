@@ -1,0 +1,57 @@
+[
+  {
+    "id": "video-editing",
+    "title": "Video Editing",
+    "category": "video",
+    "description": "Pacing, dynamic transitions, cinematic color grading, custom sound design, and viral caption styling for YouTube, Reels, and Commercials.",
+    "features": [
+      "YouTube Long-form & Shorts",
+      "Short-form Reels & TikToks",
+      "Audio Beats Syncing & SFX"
+    ]
+  },
+  {
+    "id": "photo-editing",
+    "title": "Photo Editing",
+    "category": "photo",
+    "description": "High-end skin retouching, color enhancement, object removal, background composition, and mood grading for portraits & fashion.",
+    "features": [
+      "High-End Portrait Retouching",
+      "Color Correction & Grading",
+      "Background Removal / Swap"
+    ]
+  },
+  {
+    "id": "product-editing",
+    "title": "Product Image Editing",
+    "category": "product",
+    "description": "Commercial-ready e-commerce graphics for Amazon, Shopify, and social ad campaigns with realistic shadows and highlights.",
+    "features": [
+      "Amazon & Shopify Listings",
+      "Dynamic Reflection & Lighting",
+      "Infographic & Feature Callouts"
+    ]
+  },
+  {
+    "id": "thumbnail-design",
+    "title": "Thumbnail Design",
+    "category": "thumbnail",
+    "description": "High-CTR YouTube thumbnails engineered with bold typography, expressive facial highlights, and eye-catching contrast.",
+    "features": [
+      "High CTR YouTube Thumbnails",
+      "Facial Retouching & Lighting",
+      "Bold 3D Text & Glow Effects"
+    ]
+  },
+  {
+    "id": "social-design",
+    "title": "Social Media Design",
+    "category": "social",
+    "description": "Consistent, high-luxury social graphics including social media carousels, promotional flyers, posters, and full brand visual kits.",
+    "features": [
+      "Social Carousel Layouts",
+      "Promotional Banners & Posters",
+      "Brand Kit Graphic Direction"
+    ]
+  }
+]
