@@ -1,5 +1,16 @@
 [
   {
+    "id": "inq_1789834046176",
+    "fullName": "maulik",
+    "company": "N/A",
+    "email": "maulik@gmail.com",
+    "phone": "4142434445",
+    "projectType": "Full Branding Package",
+    "budget": "$100 - $300 / ₹5,000 - ₹20,000",
+    "details": "hiiiiiiiiiii",
+    "timestamp": "2026-09-19T16:07:26.176Z"
+  },
+  {
     "id": "inq_1789830947625",
     "fullName": "himesh",
     "company": "N/A",
@@ -9,38 +20,5 @@
     "budget": "$300 - $500 / ₹20,000 - ₹40,000",
     "details": "hii harsh",
     "timestamp": "2026-09-19T15:15:47.625Z"
-  },
-  {
-    "id": "inq_1789830442322",
-    "fullName": "Harsh Verification Test",
-    "company": "Harsh Studio",
-    "email": "rajeshvariyani4@gmail.com",
-    "phone": "+91 7016585742",
-    "projectType": "Video Editing",
-    "budget": "$500+ / ?40,000+",
-    "details": "Testing direct Gmail SMTP notification delivery.",
-    "timestamp": "2026-09-19T15:07:22.322Z"
-  },
-  {
-    "id": "inq_1789830337746",
-    "fullName": "Harsh Verification Test",
-    "company": "Harsh Studio",
-    "email": "rajeshvariyani4@gmail.com",
-    "phone": "+91 7016585742",
-    "projectType": "Video Editing",
-    "budget": "$500+ / ?40,000+",
-    "details": "Testing direct Gmail SMTP notification delivery.",
-    "timestamp": "2026-09-19T15:05:37.746Z"
-  },
-  {
-    "id": "inq_1789829650074",
-    "fullName": "Harsh Variyani",
-    "company": "N/A",
-    "email": "rajeshvariyani4@gmail.com",
-    "phone": "+91 7016585742",
-    "projectType": "Video Editing",
-    "budget": "$100 - $300 / ₹5,000 - ₹20,000",
-    "details": "Submitted inquiry from website contact form",
-    "timestamp": "2026-09-19T14:54:10.074Z"
   }
 ]

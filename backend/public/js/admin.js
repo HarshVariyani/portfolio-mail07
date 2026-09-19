@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Backend Admin Dashboard Client Script
+   Harsh Portfolio - Backend Admin Dashboard Client Script (Real-time v2)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,6 +18,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const apiStatusBadge = document.getElementById('api-status-badge');
 
   let allInquiries = [];
+  let previousInquiryIds = new Set();
+  let isFirstLoad = true;
+
+  // Sound Chime for New Inquiries
+  let audioCtx = null;
+  function playNotificationChime() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.35);
+    } catch (e) {
+      // Audio fallback
+    }
+  }
 
   // ==========================================================================
   // FETCH HEALTH & SERVER UPTIME
@@ -30,45 +59,86 @@ document.addEventListener('DOMContentLoaded', () => {
         const uptimeMinutes = Math.floor(data.uptime / 60);
         const uptimeHours = (data.uptime / 3600).toFixed(1);
         statUptime.textContent = uptimeMinutes > 60 ? `${uptimeHours} hrs` : `${uptimeMinutes} mins`;
-        apiStatusBadge.className = 'status-pill status-online';
-        apiStatusBadge.innerHTML = '<span class="status-dot"></span> API ONLINE';
+        if (apiStatusBadge) {
+          apiStatusBadge.className = 'status-pill status-online';
+          apiStatusBadge.innerHTML = '<span class="status-dot"></span> LIVE SYNC (EVERY 3S)';
+        }
       }
     } catch (err) {
       console.warn('Health check failed', err);
       statUptime.textContent = 'OFFLINE';
-      apiStatusBadge.className = 'status-pill';
-      apiStatusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
-      apiStatusBadge.style.color = '#f87171';
-      apiStatusBadge.innerHTML = '⚠️ SERVER UNREACHABLE';
+      if (apiStatusBadge) {
+        apiStatusBadge.className = 'status-pill';
+        apiStatusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+        apiStatusBadge.style.color = '#f87171';
+        apiStatusBadge.innerHTML = '⚠️ SERVER UNREACHABLE';
+      }
     }
   }
 
   // ==========================================================================
-  // FETCH INQUIRIES FROM BACKEND API
+  // FETCH INQUIRIES FROM BACKEND API (REAL-TIME AUTO POLL)
   // ==========================================================================
-  async function fetchInquiries() {
+  async function fetchInquiries(isManualRefresh = false) {
     try {
-      inquiriesContainer.innerHTML = `
-        <div class="loading-spinner">
-          <i class="fa-solid fa-spinner fa-spin"></i> Fetching client inquiries...
-        </div>
-      `;
+      if (isFirstLoad && inquiriesContainer) {
+        inquiriesContainer.innerHTML = `
+          <div class="loading-spinner">
+            <i class="fa-solid fa-spinner fa-spin"></i> Fetching client inquiries...
+          </div>
+        `;
+      }
 
-      const res = await fetch('/api/inquiries');
+      const res = await fetch(`/api/inquiries?t=${Date.now()}`);
       const data = await res.json();
 
       if (data.success && Array.isArray(data.data)) {
-        allInquiries = data.data;
+        const currentInquiries = data.data;
+
+        // Detect newly arrived inquiries
+        if (!isFirstLoad) {
+          const newOrders = currentInquiries.filter(inq => !previousInquiryIds.has(inq.id));
+          if (newOrders.length > 0) {
+            playNotificationChime();
+            showToast(`🔥 New Order Received from ${newOrders[0].fullName}!`);
+          }
+        }
+
+        // Update tracking set
+        previousInquiryIds = new Set(currentInquiries.map(inq => inq.id));
+        allInquiries = currentInquiries;
         statTotalInquiries.textContent = data.count;
         calculateTopService(allInquiries);
-        renderInquiries(allInquiries);
+
+        filterAndRenderInquiries();
       } else {
-        renderEmptyState('Failed to load inquiries.');
+        if (isFirstLoad) renderEmptyState('Failed to load inquiries.');
       }
     } catch (err) {
       console.error('Fetch inquiries error:', err);
-      renderEmptyState('Error connecting to Backend API.');
+      if (isFirstLoad) renderEmptyState('Error connecting to Backend API.');
+    } finally {
+      isFirstLoad = false;
     }
+  }
+
+  function filterAndRenderInquiries() {
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const selectedService = serviceFilter ? serviceFilter.value : 'all';
+
+    const filtered = allInquiries.filter(inq => {
+      const matchQuery = !query || 
+        inq.fullName.toLowerCase().includes(query) ||
+        inq.email.toLowerCase().includes(query) ||
+        inq.details.toLowerCase().includes(query) ||
+        (inq.company && inq.company.toLowerCase().includes(query));
+
+      const matchService = selectedService === 'all' || inq.projectType === selectedService;
+
+      return matchQuery && matchService;
+    });
+
+    renderInquiries(filtered);
   }
 
   // ==========================================================================
@@ -165,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         showToast('Inquiry deleted successfully.');
-        fetchInquiries();
+        fetchInquiries(true);
       } else {
         showToast(data.message || 'Failed to delete inquiry.');
       }
@@ -266,35 +336,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Search & Filter Listeners
   if (searchInput) {
-    searchInput.addEventListener('input', filterInquiries);
+    searchInput.addEventListener('input', filterAndRenderInquiries);
   }
   if (serviceFilter) {
-    serviceFilter.addEventListener('change', filterInquiries);
-  }
-
-  function filterInquiries() {
-    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    const selectedService = serviceFilter ? serviceFilter.value : 'all';
-
-    const filtered = allInquiries.filter(inq => {
-      const matchQuery = !query || 
-        inq.fullName.toLowerCase().includes(query) ||
-        inq.email.toLowerCase().includes(query) ||
-        inq.details.toLowerCase().includes(query) ||
-        (inq.company && inq.company.toLowerCase().includes(query));
-
-      const matchService = selectedService === 'all' || inq.projectType === selectedService;
-
-      return matchQuery && matchService;
-    });
-
-    renderInquiries(filtered);
+    serviceFilter.addEventListener('change', filterAndRenderInquiries);
   }
 
   if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
       fetchServerHealth();
-      fetchInquiries();
+      fetchInquiries(true);
       fetchServices();
       showToast('Dashboard data refreshed.');
     });
@@ -304,4 +355,12 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchServerHealth();
   fetchInquiries();
   fetchServices();
+
+  // ==========================================================================
+  // REAL-TIME AUTO POLLING (EVERY 3 SECONDS)
+  // ==========================================================================
+  setInterval(() => {
+    fetchServerHealth();
+    fetchInquiries();
+  }, 3000);
 });
