@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harsh Portfolio | Backend Admin Dashboard</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Dashboard Stylesheet -->
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- Ambient Glow Background Orbs -->
+  <div class="admin-glow-orb orb-1"></div>
+  <div class="admin-glow-orb orb-2"></div>
+
+  <!-- Main Dashboard Container -->
+  <div class="admin-wrapper">
+    
+    <!-- Header Navigation -->
+    <header class="admin-header">
+      <div class="header-brand">
+        <a href="/admin" class="admin-logo">
+          HARSH<span class="logo-dot"></span> <span class="badge-admin">BACKEND ADMIN</span>
+        </a>
+      </div>
+
+      <div class="header-actions">
+        <div id="api-status-badge" class="status-pill status-online">
+          <span class="status-dot"></span> API ONLINE
+        </div>
+        <a href="http://localhost:5173" target="_blank" class="btn btn-sm btn-outline">
+          <i class="fa-solid fa-globe"></i> View Website
+        </a>
+        <button id="refresh-dashboard-btn" class="btn btn-sm btn-primary">
+          <i class="fa-solid fa-rotate"></i> Refresh Data
+        </button>
+      </div>
+    </header>
+
+    <!-- Analytics Stat Cards Row -->
+    <div class="stats-grid">
+      <!-- Total Inquiries -->
+      <div class="stat-card">
+        <div class="stat-icon-wrap icon-purple">
+          <i class="fa-solid fa-inbox"></i>
+        </div>
+        <div>
+          <div class="stat-value" id="stat-total-inquiries">0</div>
+          <div class="stat-label">Total Received Inquiries</div>
+        </div>
+      </div>
+
+      <!-- Top Requested Service -->
+      <div class="stat-card">
+        <div class="stat-icon-wrap icon-blue">
+          <i class="fa-solid fa-video"></i>
+        </div>
+        <div>
+          <div class="stat-value" id="stat-top-service">Video Editing</div>
+          <div class="stat-label">Most Requested Service</div>
+        </div>
+      </div>
+
+      <!-- Active Services -->
+      <div class="stat-card">
+        <div class="stat-icon-wrap icon-emerald">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div>
+          <div class="stat-value" id="stat-services-count">5</div>
+          <div class="stat-label">Active Portfolio Services</div>
+        </div>
+      </div>
+
+      <!-- Server Uptime -->
+      <div class="stat-card">
+        <div class="stat-icon-wrap icon-amber">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <div>
+          <div class="stat-value" id="stat-uptime">--</div>
+          <div class="stat-label">Express Server Uptime</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Section: Inquiries Control Panel -->
+    <main class="dashboard-main">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Client Inquiries Stream</h2>
+          <p class="section-subtitle">Real-time incoming project leads and inquiries submitted from your portfolio website.</p>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="controls-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="inquiry-search-input" placeholder="Search by name, email, or service...">
+          </div>
+
+          <select id="inquiry-service-filter" class="filter-select">
+            <option value="all">All Services</option>
+            <option value="Video Editing">Video Editing</option>
+            <option value="Photo Editing">Photo Editing</option>
+            <option value="Product Image Editing">Product Editing</option>
+            <option value="Thumbnail Design">Thumbnail Design</option>
+            <option value="Social Media Design">Social Media Design</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Inquiries Stream Container -->
+      <div id="inquiries-stream-container" class="inquiries-stream">
+        <div class="loading-spinner">
+          <i class="fa-solid fa-spinner fa-spin"></i> Loading inquiries from backend API...
+        </div>
+      </div>
+    </main>
+
+    <!-- Services & Portfolio Overview Section -->
+    <section class="services-overview-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Active Creative Services Data API</h2>
+          <p class="section-subtitle">Live services served by <code>GET /api/services</code> to your website.</p>
+        </div>
+      </div>
+
+      <div id="services-grid-container" class="services-admin-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+      <p>© 2026 Harsh Personal Portfolio Backend • Express API v1.0 • Node.js Server</p>
+    </footer>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="adminToast" class="admin-toast">Notice message here</div>
+
+  <!-- Dashboard JavaScript -->
+  <script src="js/admin.js"></script>
+</body>
+</html>

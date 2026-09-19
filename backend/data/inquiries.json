@@ -1,5 +1,38 @@
 [
   {
+    "id": "inq_1789830947625",
+    "fullName": "himesh",
+    "company": "N/A",
+    "email": "himesh@gmail.com",
+    "phone": "7016585427",
+    "projectType": "Thumbnail Design",
+    "budget": "$300 - $500 / ₹20,000 - ₹40,000",
+    "details": "hii harsh",
+    "timestamp": "2026-09-19T15:15:47.625Z"
+  },
+  {
+    "id": "inq_1789830442322",
+    "fullName": "Harsh Verification Test",
+    "company": "Harsh Studio",
+    "email": "rajeshvariyani4@gmail.com",
+    "phone": "+91 7016585742",
+    "projectType": "Video Editing",
+    "budget": "$500+ / ?40,000+",
+    "details": "Testing direct Gmail SMTP notification delivery.",
+    "timestamp": "2026-09-19T15:07:22.322Z"
+  },
+  {
+    "id": "inq_1789830337746",
+    "fullName": "Harsh Verification Test",
+    "company": "Harsh Studio",
+    "email": "rajeshvariyani4@gmail.com",
+    "phone": "+91 7016585742",
+    "projectType": "Video Editing",
+    "budget": "$500+ / ?40,000+",
+    "details": "Testing direct Gmail SMTP notification delivery.",
+    "timestamp": "2026-09-19T15:05:37.746Z"
+  },
+  {
     "id": "inq_1789829650074",
     "fullName": "Harsh Variyani",
     "company": "N/A",

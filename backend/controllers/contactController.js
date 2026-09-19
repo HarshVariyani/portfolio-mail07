@@ -80,42 +80,48 @@ const handleContactForm = async (req, res) => {
     // Email dispatch via Nodemailer if SMTP configured
     const transporter = createTransporter();
     let emailSent = false;
+    let emailError = null;
 
     if (transporter) {
-      const receiverEmail = process.env.RECEIVER_EMAIL || 'harshvariyani24@gmail.com';
-      const mailOptions = {
-        from: `"Harsh Portfolio Site" <${process.env.SMTP_USER}>`,
-        to: receiverEmail,
-        replyTo: inquiryData.email,
-        subject: `🔥 New Portfolio Inquiry: ${inquiryData.fullName} (${inquiryData.projectType})`,
-        html: `
-          <div style="font-family: Arial, sans-serif; background-color: #0b0b10; color: #ffffff; padding: 25px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid #333;">
-            <h2 style="color: #ffffff; border-bottom: 2px solid #ffffff; padding-bottom: 10px;">New Project Inquiry Received</h2>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: #d1d5db;">
-              <tr><td style="padding: 8px 0; font-weight: bold; width: 140px;">Client Name:</td><td>${inquiryData.fullName}</td></tr>
-              <tr><td style="padding: 8px 0; font-weight: bold;">Company:</td><td>${inquiryData.company}</td></tr>
-              <tr><td style="padding: 8px 0; font-weight: bold;">Email:</td><td><a href="mailto:${inquiryData.email}" style="color: #60a5fa;">${inquiryData.email}</a></td></tr>
-              <tr><td style="padding: 8px 0; font-weight: bold;">Phone / WA:</td><td>${inquiryData.phone}</td></tr>
-              <tr><td style="padding: 8px 0; font-weight: bold;">Project Type:</td><td><span style="background: #1e293b; padding: 4px 10px; border-radius: 6px; color: #60a5fa;">${inquiryData.projectType}</span></td></tr>
-              <tr><td style="padding: 8px 0; font-weight: bold;">Budget:</td><td><span style="background: #064e3b; padding: 4px 10px; border-radius: 6px; color: #34d399;">${inquiryData.budget}</span></td></tr>
-            </table>
+      try {
+        const receiverEmail = process.env.RECEIVER_EMAIL || 'harshvariyani24@gmail.com';
+        const mailOptions = {
+          from: `"Harsh Portfolio Site" <${process.env.SMTP_USER}>`,
+          to: receiverEmail,
+          replyTo: inquiryData.email,
+          subject: `🔥 New Portfolio Inquiry: ${inquiryData.fullName} (${inquiryData.projectType})`,
+          html: `
+            <div style="font-family: Arial, sans-serif; background-color: #0b0b10; color: #ffffff; padding: 25px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid #333;">
+              <h2 style="color: #ffffff; border-bottom: 2px solid #ffffff; padding-bottom: 10px;">New Project Inquiry Received</h2>
+              
+              <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: #d1d5db;">
+                <tr><td style="padding: 8px 0; font-weight: bold; width: 140px;">Client Name:</td><td>${inquiryData.fullName}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: bold;">Company:</td><td>${inquiryData.company}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: bold;">Email:</td><td><a href="mailto:${inquiryData.email}" style="color: #60a5fa;">${inquiryData.email}</a></td></tr>
+                <tr><td style="padding: 8px 0; font-weight: bold;">Phone / WA:</td><td>${inquiryData.phone}</td></tr>
+                <tr><td style="padding: 8px 0; font-weight: bold;">Project Type:</td><td><span style="background: #1e293b; padding: 4px 10px; border-radius: 6px; color: #60a5fa;">${inquiryData.projectType}</span></td></tr>
+                <tr><td style="padding: 8px 0; font-weight: bold;">Budget:</td><td><span style="background: #064e3b; padding: 4px 10px; border-radius: 6px; color: #34d399;">${inquiryData.budget}</span></td></tr>
+              </table>
 
-            <h3 style="color: #ffffff; margin-top: 20px;">Project Details:</h3>
-            <div style="background: #181824; padding: 15px; border-radius: 8px; color: #f3f4f6; line-height: 1.6; white-space: pre-line; border-left: 4px solid #60a5fa;">
-              ${inquiryData.details}
+              <h3 style="color: #ffffff; margin-top: 20px;">Project Details:</h3>
+              <div style="background: #181824; padding: 15px; border-radius: 8px; color: #f3f4f6; line-height: 1.6; white-space: pre-line; border-left: 4px solid #60a5fa;">
+                ${inquiryData.details}
+              </div>
+
+              <p style="font-size: 12px; color: #6b7280; margin-top: 25px; text-align: center;">
+                Submitted via Harsh Portfolio Backend API • ${inquiryData.timestamp}
+              </p>
             </div>
+          `
+        };
 
-            <p style="font-size: 12px; color: #6b7280; margin-top: 25px; text-align: center;">
-              Submitted via Harsh Portfolio Backend API • ${inquiryData.timestamp}
-            </p>
-          </div>
-        `
-      };
-
-      await transporter.sendMail(mailOptions);
-      emailSent = true;
-      console.log(`[Email Sent] Notification delivered to ${receiverEmail}`);
+        await transporter.sendMail(mailOptions);
+        emailSent = true;
+        console.log(`[Email Sent] Notification delivered to ${receiverEmail}`);
+      } catch (mErr) {
+        emailError = mErr.message;
+        console.warn(`[SMTP Warning] Email dispatch failed (${mErr.code || mErr.message}). Form submission was still saved to inquiries.json.`);
+      }
     }
 
     return res.status(200).json({
@@ -123,7 +129,8 @@ const handleContactForm = async (req, res) => {
       message: 'Thank you! Your inquiry has been received successfully. Harsh will contact you shortly.',
       data: {
         inquiryId: inquiryData.id,
-        emailSent
+        emailSent,
+        emailNote: emailSent ? 'Email sent to inbox' : 'Inquiry saved to inquiries.json'
       }
     });
   } catch (error) {
@@ -147,4 +154,36 @@ const getInquiries = (req, res) => {
   });
 };
 
-module.exports = { handleContactForm, getInquiries };
+/**
+ * Delete Inquiry by ID
+ */
+const deleteInquiry = (req, res) => {
+  const { id } = req.params;
+  let list = readInquiriesFromFile();
+
+  const initialLength = list.length;
+  list = list.filter(item => item.id !== id);
+
+  if (list.length === initialLength) {
+    return res.status(404).json({
+      success: false,
+      message: 'Inquiry not found.'
+    });
+  }
+
+  try {
+    fs.writeFileSync(inquiriesFilePath, JSON.stringify(list, null, 2), 'utf8');
+    return res.status(200).json({
+      success: true,
+      message: 'Inquiry deleted successfully.'
+    });
+  } catch (err) {
+    console.error('Error deleting inquiry:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Error deleting inquiry file.'
+    });
+  }
+};
+
+module.exports = { handleContactForm, getInquiries, deleteInquiry };
