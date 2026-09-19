@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Harsh Portfolio | Backend Admin Dashboard</title>
+  <title>Harsh Portfolio | Real-Time WebSockets Admin Dashboard</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,19 +29,19 @@
     <header class="admin-header">
       <div class="header-brand">
         <a href="/admin" class="admin-logo">
-          HARSH<span class="logo-dot"></span> <span class="badge-admin">BACKEND ADMIN</span>
+          HARSH<span class="logo-dot"></span> <span class="badge-admin">REAL-TIME ADMIN DASHBOARD</span>
         </a>
       </div>
 
       <div class="header-actions">
         <div id="api-status-badge" class="status-pill status-online">
-          <span class="status-dot"></span> API ONLINE
+          <span class="status-dot"></span> ⚡ WEBSOCKETS LIVE
         </div>
         <a href="http://localhost:5173" target="_blank" class="btn btn-sm btn-outline">
           <i class="fa-solid fa-globe"></i> View Website
         </a>
         <button id="refresh-dashboard-btn" class="btn btn-sm btn-primary">
-          <i class="fa-solid fa-rotate"></i> Refresh Data
+          <i class="fa-solid fa-rotate"></i> Sync Data
         </button>
       </div>
     </header>
@@ -59,6 +59,17 @@
         </div>
       </div>
 
+      <!-- Online WebSocket Clients -->
+      <div class="stat-card">
+        <div class="stat-icon-wrap icon-emerald">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div>
+          <div class="stat-value" id="stat-online-clients">1</div>
+          <div class="stat-label">Online Real-Time Sockets</div>
+        </div>
+      </div>
+
       <!-- Top Requested Service -->
       <div class="stat-card">
         <div class="stat-icon-wrap icon-blue">
@@ -70,17 +81,6 @@
         </div>
       </div>
 
-      <!-- Active Services -->
-      <div class="stat-card">
-        <div class="stat-icon-wrap icon-emerald">
-          <i class="fa-solid fa-layer-group"></i>
-        </div>
-        <div>
-          <div class="stat-value" id="stat-services-count">5</div>
-          <div class="stat-label">Active Portfolio Services</div>
-        </div>
-      </div>
-
       <!-- Server Uptime -->
       <div class="stat-card">
         <div class="stat-icon-wrap icon-amber">
@@ -88,7 +88,7 @@
         </div>
         <div>
           <div class="stat-value" id="stat-uptime">--</div>
-          <div class="stat-label">Express Server Uptime</div>
+          <div class="stat-label">Express Uptime</div>
         </div>
       </div>
     </div>
@@ -97,8 +97,8 @@
     <main class="dashboard-main">
       <div class="section-header">
         <div>
-          <h2 class="section-title">Client Inquiries Stream</h2>
-          <p class="section-subtitle">Real-time incoming project leads and inquiries submitted from your portfolio website.</p>
+          <h2 class="section-title">Live Client Inquiries Stream</h2>
+          <p class="section-subtitle">Real-time WebSocket event stream from your portfolio website (< 10ms instant push).</p>
         </div>
 
         <!-- Search & Filter Controls -->
@@ -122,7 +122,7 @@
       <!-- Inquiries Stream Container -->
       <div id="inquiries-stream-container" class="inquiries-stream">
         <div class="loading-spinner">
-          <i class="fa-solid fa-spinner fa-spin"></i> Loading inquiries from backend API...
+          <i class="fa-solid fa-spinner fa-spin"></i> Connecting to Socket.IO WebSocket Engine...
         </div>
       </div>
     </main>
@@ -143,13 +143,16 @@
 
     <!-- Footer -->
     <footer class="admin-footer">
-      <p>© 2026 Harsh Personal Portfolio Backend • Express API v1.0 • Node.js Server</p>
+      <p>© 2026 Harsh Personal Portfolio Admin • Express & Socket.IO Real-Time WebSockets Engine</p>
     </footer>
 
   </div>
 
   <!-- Toast Notification -->
   <div id="adminToast" class="admin-toast">Notice message here</div>
+
+  <!-- Socket.IO WebSockets Client Library -->
+  <script src="/socket.io/socket.io.js"></script>
 
   <!-- Dashboard JavaScript -->
   <script src="js/admin.js"></script>

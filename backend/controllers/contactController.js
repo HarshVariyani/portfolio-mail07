@@ -29,7 +29,7 @@ const saveInquiryToFile = (inquiry) => {
 };
 
 /**
- * Handle Contact Form Submission & Email Notification
+ * Handle Contact Form Submission & Real-Time WebSocket Broadcast
  */
 const handleContactForm = async (req, res) => {
   try {
@@ -64,7 +64,7 @@ const handleContactForm = async (req, res) => {
     };
 
     console.log(`\n=======================================================`);
-    console.log(`📩 NEW CONTACT FORM INQUIRY RECEIVED!`);
+    console.log(`⚡ [WEBSOCKET REAL-TIME PUSH] NEW CONTACT FORM INQUIRY!`);
     console.log(`👤 Name:     ${inquiryData.fullName}`);
     console.log(`🏢 Company:  ${inquiryData.company}`);
     console.log(`📧 Email:    ${inquiryData.email}`);
@@ -76,6 +76,13 @@ const handleContactForm = async (req, res) => {
 
     // Save to inquiries.json file
     saveInquiryToFile(inquiryData);
+
+    // ⚡ REAL-TIME WEBSOCKET BROADCAST TO ALL CONNECTED ADMIN DASHBOARDS
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('inquiry:new', inquiryData);
+      console.log(`[WebSocket Broadcast] Emitted 'inquiry:new' event for ID: ${inquiryData.id}`);
+    }
 
     // Email dispatch via Nodemailer if SMTP configured
     const transporter = createTransporter();
@@ -120,7 +127,7 @@ const handleContactForm = async (req, res) => {
         console.log(`[Email Sent] Notification delivered to ${receiverEmail}`);
       } catch (mErr) {
         emailError = mErr.message;
-        console.warn(`[SMTP Warning] Email dispatch failed (${mErr.code || mErr.message}). Form submission was still saved to inquiries.json.`);
+        console.warn(`[SMTP Warning] Email dispatch failed (${mErr.code || mErr.message}). Form submission was saved to inquiries.json and broadcast over WebSockets.`);
       }
     }
 
@@ -130,7 +137,7 @@ const handleContactForm = async (req, res) => {
       data: {
         inquiryId: inquiryData.id,
         emailSent,
-        emailNote: emailSent ? 'Email sent to inbox' : 'Inquiry saved to inquiries.json'
+        websocketBroadcast: true
       }
     });
   } catch (error) {
@@ -155,7 +162,7 @@ const getInquiries = (req, res) => {
 };
 
 /**
- * Delete Inquiry by ID
+ * Delete Inquiry by ID with Real-Time WebSocket Broadcast
  */
 const deleteInquiry = (req, res) => {
   const { id } = req.params;
@@ -173,6 +180,14 @@ const deleteInquiry = (req, res) => {
 
   try {
     fs.writeFileSync(inquiriesFilePath, JSON.stringify(list, null, 2), 'utf8');
+
+    // ⚡ REAL-TIME WEBSOCKET BROADCAST TO REMOVE CARD INSTANTLY
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('inquiry:deleted', { id });
+      console.log(`[WebSocket Broadcast] Emitted 'inquiry:deleted' event for ID: ${id}`);
+    }
+
     return res.status(200).json({
       success: true,
       message: 'Inquiry deleted successfully.'

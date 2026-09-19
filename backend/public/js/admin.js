@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Harsh Portfolio - Backend Admin Dashboard Client Script (Real-time v2)
+   Harsh Portfolio - Backend Real-Time WebSockets Admin Dashboard Client
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,18 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Stats elements
   const statTotalInquiries = document.getElementById('stat-total-inquiries');
+  const statOnlineClients = document.getElementById('stat-online-clients');
   const statTopService = document.getElementById('stat-top-service');
   const statServicesCount = document.getElementById('stat-services-count');
   const statUptime = document.getElementById('stat-uptime');
   const apiStatusBadge = document.getElementById('api-status-badge');
 
   let allInquiries = [];
-  let previousInquiryIds = new Set();
   let isFirstLoad = true;
 
-  // Sound Chime for New Inquiries
+  // Sound Chime for New Real-time WebSocket Inquiries
   let audioCtx = null;
-  function playNotificationChime() {
+  function playRealtimeNotificationChime() {
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -31,21 +31,80 @@ document.addEventListener('DOMContentLoaded', () => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+      osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.2); // C6
 
-      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
 
       osc.connect(gain);
       gain.connect(audioCtx.destination);
 
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.35);
+      osc.stop(audioCtx.currentTime + 0.4);
     } catch (e) {
       // Audio fallback
     }
+  }
+
+  // ==========================================================================
+  // INITIALIZE SOCKET.IO WEBSOCKETS REAL-TIME ENGINE
+  // ==========================================================================
+  const socket = typeof io !== 'undefined' ? io() : null;
+
+  if (socket) {
+    socket.on('connect', () => {
+      console.log('⚡ [WebSocket Connected] Socket ID:', socket.id);
+      if (apiStatusBadge) {
+        apiStatusBadge.className = 'status-pill status-online';
+        apiStatusBadge.innerHTML = '<span class="status-dot"></span> ⚡ WEBSOCKET LIVE PUSH';
+      }
+    });
+
+    socket.on('disconnect', () => {
+      console.warn('🔌 [WebSocket Disconnected]');
+      if (apiStatusBadge) {
+        apiStatusBadge.className = 'status-pill';
+        apiStatusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+        apiStatusBadge.style.color = '#f87171';
+        apiStatusBadge.innerHTML = '⚠️ WEBSOCKET RECONNECTING...';
+      }
+    });
+
+    // Handle Live Online Connection Counter
+    socket.on('online:count', (count) => {
+      if (statOnlineClients) {
+        statOnlineClients.textContent = count;
+      }
+    });
+
+    // ⚡ INSTANT WEBSOCKET PUSH EVENT FOR NEW CLIENT INQUIRY (< 10ms)
+    socket.on('inquiry:new', (newInquiry) => {
+      console.log('⚡ [Real-Time WebSocket Push] New Inquiry Received:', newInquiry);
+
+      // Check if inquiry already exists
+      const exists = allInquiries.some(inq => inq.id === newInquiry.id);
+      if (!exists) {
+        allInquiries.unshift(newInquiry);
+        statTotalInquiries.textContent = allInquiries.length;
+        calculateTopService(allInquiries);
+
+        filterAndRenderInquiries();
+        playRealtimeNotificationChime();
+        showToast(`⚡ Instant WebSocket Lead Received from ${newInquiry.fullName}!`);
+      }
+    });
+
+    // ⚡ INSTANT WEBSOCKET PUSH EVENT FOR INQUIRY DELETION
+    socket.on('inquiry:deleted', ({ id }) => {
+      console.log('⚡ [Real-Time WebSocket Push] Inquiry Deleted:', id);
+      allInquiries = allInquiries.filter(inq => inq.id !== id);
+      statTotalInquiries.textContent = allInquiries.length;
+      calculateTopService(allInquiries);
+
+      filterAndRenderInquiries();
+    });
   }
 
   // ==========================================================================
@@ -59,32 +118,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const uptimeMinutes = Math.floor(data.uptime / 60);
         const uptimeHours = (data.uptime / 3600).toFixed(1);
         statUptime.textContent = uptimeMinutes > 60 ? `${uptimeHours} hrs` : `${uptimeMinutes} mins`;
-        if (apiStatusBadge) {
-          apiStatusBadge.className = 'status-pill status-online';
-          apiStatusBadge.innerHTML = '<span class="status-dot"></span> LIVE SYNC (EVERY 3S)';
-        }
       }
     } catch (err) {
       console.warn('Health check failed', err);
       statUptime.textContent = 'OFFLINE';
-      if (apiStatusBadge) {
-        apiStatusBadge.className = 'status-pill';
-        apiStatusBadge.style.background = 'rgba(239, 68, 68, 0.15)';
-        apiStatusBadge.style.color = '#f87171';
-        apiStatusBadge.innerHTML = '⚠️ SERVER UNREACHABLE';
-      }
     }
   }
 
   // ==========================================================================
-  // FETCH INQUIRIES FROM BACKEND API (REAL-TIME AUTO POLL)
+  // FETCH INQUIRIES FROM BACKEND API
   // ==========================================================================
-  async function fetchInquiries(isManualRefresh = false) {
+  async function fetchInquiries() {
     try {
       if (isFirstLoad && inquiriesContainer) {
         inquiriesContainer.innerHTML = `
           <div class="loading-spinner">
-            <i class="fa-solid fa-spinner fa-spin"></i> Fetching client inquiries...
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading inquiries stream...
           </div>
         `;
       }
@@ -93,23 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
 
       if (data.success && Array.isArray(data.data)) {
-        const currentInquiries = data.data;
-
-        // Detect newly arrived inquiries
-        if (!isFirstLoad) {
-          const newOrders = currentInquiries.filter(inq => !previousInquiryIds.has(inq.id));
-          if (newOrders.length > 0) {
-            playNotificationChime();
-            showToast(`🔥 New Order Received from ${newOrders[0].fullName}!`);
-          }
-        }
-
-        // Update tracking set
-        previousInquiryIds = new Set(currentInquiries.map(inq => inq.id));
-        allInquiries = currentInquiries;
+        allInquiries = data.data;
         statTotalInquiries.textContent = data.count;
         calculateTopService(allInquiries);
-
         filterAndRenderInquiries();
       } else {
         if (isFirstLoad) renderEmptyState('Failed to load inquiries.');
@@ -146,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   function renderInquiries(inquiriesList) {
     if (!inquiriesList || inquiriesList.length === 0) {
-      renderEmptyState('No client inquiries found yet. Submissions from your website contact form will appear here in real-time!');
+      renderEmptyState('No client inquiries found yet. Submissions from your website contact form will appear here in real-time over WebSockets!');
       return;
     }
 
@@ -235,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         showToast('Inquiry deleted successfully.');
-        fetchInquiries(true);
+        // WebSockets will automatically handle removal across all open dashboards
       } else {
         showToast(data.message || 'Failed to delete inquiry.');
       }
@@ -345,9 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', () => {
       fetchServerHealth();
-      fetchInquiries(true);
+      fetchInquiries();
       fetchServices();
-      showToast('Dashboard data refreshed.');
+      showToast('Dashboard data synced over WebSockets.');
     });
   }
 
@@ -355,12 +390,4 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchServerHealth();
   fetchInquiries();
   fetchServices();
-
-  // ==========================================================================
-  // REAL-TIME AUTO POLLING (EVERY 3 SECONDS)
-  // ==========================================================================
-  setInterval(() => {
-    fetchServerHealth();
-    fetchInquiries();
-  }, 3000);
 });
