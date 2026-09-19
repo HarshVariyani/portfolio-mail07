@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { handleContactForm } = require('../controllers/contactController');
+const { handleContactForm, getInquiries } = require('../controllers/contactController');
 const { getServices, getPortfolio } = require('../controllers/portfolioController');
 
 // Health Check Endpoint
@@ -16,6 +16,7 @@ router.get('/health', (req, res) => {
 
 // API Routes
 router.post('/contact', handleContactForm);
+router.get('/inquiries', getInquiries);
 router.get('/services', getServices);
 router.get('/portfolio', getPortfolio);
 

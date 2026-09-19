@@ -30,10 +30,10 @@ app.get('/', (req, res) => {
       <h1 style="font-size: 2.5rem; letter-spacing: 2px;">HARSH PORTFOLIO BACKEND API</h1>
       <p style="color: #a1a1aa;">Status: <span style="color: #4ade80; font-weight: bold;">ONLINE</span></p>
       <p style="color: #71717a;">Available API Endpoints: 
-        <code style="color: #60a5fa;">/api/health</code>, 
-        <code style="color: #60a5fa;">/api/contact</code>, 
-        <code style="color: #60a5fa;">/api/services</code>, 
-        <code style="color: #60a5fa;">/api/portfolio</code>
+        <a href="/api/health" style="color: #60a5fa;">/api/health</a>, 
+        <a href="/api/inquiries" style="color: #60a5fa;">/api/inquiries</a>, 
+        <a href="/api/services" style="color: #60a5fa;">/api/services</a>, 
+        <a href="/api/portfolio" style="color: #60a5fa;">/api/portfolio</a>
       </p>
     </div>
   `);
@@ -52,6 +52,7 @@ app.listen(PORT, () => {
   console.log(`=======================================================`);
   console.log(`🚀 HARSH PORTFOLIO BACKEND SERVER IS RUNNING`);
   console.log(`📡 URL: http://localhost:${PORT}`);
+  console.log(`📥 Received Inquiries API: http://localhost:${PORT}/api/inquiries`);
   console.log(`⏰ Started at: ${new Date().toLocaleString()}`);
   console.log(`=======================================================`);
 });

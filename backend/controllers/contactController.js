@@ -1,4 +1,32 @@
+const fs = require('fs');
+const path = require('path');
 const { createTransporter } = require('../config/mailer');
+
+const inquiriesFilePath = path.join(__dirname, '../data/inquiries.json');
+
+// Helper to read existing inquiries
+const readInquiriesFromFile = () => {
+  try {
+    if (fs.existsSync(inquiriesFilePath)) {
+      const content = fs.readFileSync(inquiriesFilePath, 'utf8');
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.error('Error reading inquiries file:', err);
+  }
+  return [];
+};
+
+// Helper to save inquiries to file
+const saveInquiryToFile = (inquiry) => {
+  try {
+    const list = readInquiriesFromFile();
+    list.unshift(inquiry); // Add newest inquiry to top
+    fs.writeFileSync(inquiriesFilePath, JSON.stringify(list, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error saving inquiry file:', err);
+  }
+};
 
 /**
  * Handle Contact Form Submission & Email Notification
@@ -35,7 +63,19 @@ const handleContactForm = async (req, res) => {
       timestamp: new Date().toISOString()
     };
 
-    console.log(`[Contact Inquiry Received] ID: ${inquiryData.id} | From: ${inquiryData.fullName} (${inquiryData.email})`);
+    console.log(`\n=======================================================`);
+    console.log(`📩 NEW CONTACT FORM INQUIRY RECEIVED!`);
+    console.log(`👤 Name:     ${inquiryData.fullName}`);
+    console.log(`🏢 Company:  ${inquiryData.company}`);
+    console.log(`📧 Email:    ${inquiryData.email}`);
+    console.log(`📞 Phone:    ${inquiryData.phone}`);
+    console.log(`🎥 Service:  ${inquiryData.projectType}`);
+    console.log(`💰 Budget:   ${inquiryData.budget}`);
+    console.log(`💬 Details:  ${inquiryData.details}`);
+    console.log(`=======================================================\n`);
+
+    // Save to inquiries.json file
+    saveInquiryToFile(inquiryData);
 
     // Email dispatch via Nodemailer if SMTP configured
     const transporter = createTransporter();
@@ -95,4 +135,16 @@ const handleContactForm = async (req, res) => {
   }
 };
 
-module.exports = { handleContactForm };
+/**
+ * Get All Received Inquiries
+ */
+const getInquiries = (req, res) => {
+  const inquiries = readInquiriesFromFile();
+  return res.status(200).json({
+    success: true,
+    count: inquiries.length,
+    data: inquiries
+  });
+};
+
+module.exports = { handleContactForm, getInquiries };
